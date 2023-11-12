@@ -1,0 +1,15 @@
+name: citesim
+channels:
+  - conda-forge
+dependencies:
+  - matplotlib=3.5
+  - pandas
+  - tqdm
+  - black
+  - plotnine
+  - pip
+  - pip:
+    - hydra-core  
+  - numpy
+  - pytorch
+# and sciterra, installed via git for now
