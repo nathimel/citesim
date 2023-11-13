@@ -69,6 +69,7 @@ class Experiment:
                 raise Exception(f"To build out a centered atlas, the center is specified by loading a bibtex file with a single entry. Found {num_entries} entries in {bibtex_fp}")
 
             atl = atl_center
+            (atl.center, ) = atl.publications.keys()
 
         self.atlas = atl
         self.atlas.save(atlas_dirpath=self.atlas_dir)
