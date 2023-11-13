@@ -1,0 +1,3 @@
+target_size: 100
+max_failed_expansions: 2
+n_pubs_max: 10

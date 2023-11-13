@@ -3,8 +3,8 @@
 ##############################################################################
 
 defaults:
-  - plot: custom
-  - override hydra/job_logging: custom    
+  - experiment: dev
+  - override hydra/job_logging: custom  
   - _self_ # stuff below can override stuff above  
 
 seed: 42
@@ -18,18 +18,24 @@ filepaths:
   # Data to read in
   ############################################################################
 
+  atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib
 
   ############################################################################
   # Outputs
   ############################################################################  
 
-  
   ############################################################################
   # Hydra automatic folder naming
   ############################################################################
 
+
+  # Let vectorizer model be possibly saved in intermediate level of folder hierarchy so we can load the same one for diff parameter sweeps.
+  vectorizer_subdir: librarian=${experiment.librarian.name}/vectorizer=${experiment.vectorizer.name} # N.B.: vectorizers of the same name will not be distinguished even if they were given different kwargs.
+
+  experiment_subdir: ${filepaths.vectorizer_subdir}/center=${experiment.atlas.center}
+
   # where the current working directory will be when hydra is running
-  leaf_subdir: helloworld
+  leaf_subdir: ${filepaths.experiment_subdir}
 
   # hydra run root directory
   hydra_run_root: outputs
@@ -48,6 +54,9 @@ hydra:
     config:
       override_dirname:
         exclude_keys:
+          - experiment.librarian.name
+          - experiment.vectorizer.name
+          - experiment.atlas.center
           - seed
 
   sweep:
