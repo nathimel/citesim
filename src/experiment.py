@@ -5,6 +5,7 @@ import hydra
 from omegaconf import DictConfig
 
 from sciterra.mapping.tracing import AtlasTracer
+from sciterra.mapping.cartography import pub_has_attributes, pub_has_fields_of_study
 
 class Experiment:
 
@@ -39,10 +40,18 @@ class Experiment:
         """
         crt = self.config.experiment.cartography
 
+        # Get Cartographer.project kwargs
+        rpcs = crt.required_pub_conditions
+        require_func = lambda pub: (
+            pub_has_attributes(pub, rpcs.attributes) 
+            and pub_has_fields_of_study(pub, rpcs.fields_of_study)
+        )
+
         self.tracer.expand_atlas(
             target_size = crt.target_size,
             max_failed_expansions = crt.max_failed_expansions,
             n_pubs_max = crt.n_pubs_max,
             call_size = self.config.experiment.librarian.call_size,
             record_pubs_per_update=True,
+            require_func=require_func,
         )

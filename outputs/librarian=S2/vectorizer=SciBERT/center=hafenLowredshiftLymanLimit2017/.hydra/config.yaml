@@ -9,9 +9,16 @@ experiment:
   atlas:
     center: hafenLowredshiftLymanLimit2017
   cartography:
-    target_size: 100
+    target_size: 10000
     max_failed_expansions: 2
-    n_pubs_max: 10
+    n_pubs_max: 500
+    required_pub_conditions:
+      attributes:
+      - abstract
+      - publication_date
+      - fields_of_study
+      fields_of_study:
+      - Physics
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

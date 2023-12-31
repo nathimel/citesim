@@ -1,3 +1,14 @@
 target_size: 100
 max_failed_expansions: 2
 n_pubs_max: 10
+
+required_pub_conditions:
+  attributes:
+  # ALL of the following  
+    - abstract
+    - publication_date
+    - fields_of_study
+
+  fields_of_study:
+  # ANY of the following; we could alternatively use center's fields_of_study
+    - Physics
