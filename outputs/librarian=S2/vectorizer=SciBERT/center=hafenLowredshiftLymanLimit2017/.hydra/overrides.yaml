@@ -1,2 +1,1 @@
-- experiment.cartography.target_size=10000
-- experiment.cartography.n_pubs_max=500
+- experiment/vectorizer=SciBERT

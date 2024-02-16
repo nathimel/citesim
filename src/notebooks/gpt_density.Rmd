@@ -1,0 +1,183 @@
+---
+title: "gpt_density"
+author: "Nathaniel Imel"
+date: "2024-02-06"
+output: html_document
+---
+
+```{r setup}
+library(tidyverse)
+library(lme4)
+library(modelr)
+library(viridis)
+library(ggrepel)
+library(latex2exp)
+```
+
+
+```{r load data}
+df = read_csv("df_filtered.csv")
+# df
+```
+
+
+
+```{r plot}
+
+(
+    ggplot(
+        df,
+        mapping=aes(
+            x=density, 
+            # x="edginess",
+            y=citations_per_year,
+        )
+    )
+    + geom_point(
+        alpha=0.2,
+    )
+    + xlab("Density")
+    # + xlab("Asymmetry")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```
+
+
+```{r plot2}
+
+(
+    ggplot(
+        df,
+        mapping=aes(
+            x=density, 
+            # x="edginess",
+            y=citations_per_year,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "magma", discrete = TRUE)
+    + xlab("Density")
+    # + xlab("Asymmetry")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```
+
+
+
+```{r plot3}
+
+(
+    ggplot(
+        df,
+        mapping=aes(
+            x=edginess, 
+            y=citations_per_year,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "magma", discrete = TRUE)
+    + xlab("Edginess")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```
+
+
+```{r plot4}
+
+# Plot density and asymmetry against each other
+(
+  ggplot(
+    df,
+    mapping = aes(
+      x = density,
+      y = edginess,
+      color = citations_per_year,
+    )
+  )
+  + geom_point()
+)
+
+```
+
+
+```{r plot5}
+# Z-scale density
+
+df_z <- df %>% mutate(
+  df,
+  density_z = scale(density),
+)
+
+
+(
+    ggplot(
+        df_z,
+        mapping=aes(
+            x=density_z, 
+            y=citations_per_year,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    + xlab("Density z-scaled")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```
+
+
+
+```{r save plot}
+# ggsave(
+#   "density.png",
+#   width=10,
+#   height=10,
+# )
+```

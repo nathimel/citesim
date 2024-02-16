@@ -1,0 +1,4 @@
+defaults:
+  - attributes: abs_pub_fields
+  - fields_of_study: physics
+  - _self_ # stuff below can override stuff above  

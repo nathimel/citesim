@@ -3,13 +3,13 @@
 import hydra
 from omegaconf import DictConfig
 
-from util import set_seed
+import util
 from experiment import Experiment
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
 def main(config: DictConfig):
-    set_seed(config.seed)
+    util.set_seed(config.seed)
 
     exp = Experiment(config)
 

@@ -1,2 +1,3 @@
 name: S2
-call_size: null
+kwargs:
+  api_key_fn: null

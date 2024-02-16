@@ -1,7 +1,8 @@
 experiment:
   librarian:
     name: S2
-    call_size: null
+    kwargs:
+      api_key_fn: null
   vectorizer:
     name: SciBERT
     kwargs:
@@ -9,9 +10,6 @@ experiment:
   atlas:
     center: hafenLowredshiftLymanLimit2017
   cartography:
-    target_size: 10000
-    max_failed_expansions: 2
-    n_pubs_max: 500
     required_pub_conditions:
       attributes:
       - abstract
@@ -19,6 +17,11 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Physics
+    target_size: 100
+    max_failed_expansions: 2
+    n_pubs_max: 10
+    batch_size: 64
+    call_size: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

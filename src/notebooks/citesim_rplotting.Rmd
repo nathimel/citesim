@@ -1,0 +1,111 @@
+---
+title: "citesim_plotting"
+author: "Nathaniel Imel"
+date: "2024-02-15"
+output: html_document
+---
+
+
+```{r setup}
+library(tidyverse)
+library(lme4)
+library(modelr)
+library(viridis)
+library(ggrepel)
+library(latex2exp)
+```
+
+
+```{r load data}
+df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=Word2Vec/center=hafenLowredshiftLymanLimit2017/all_data.csv")
+df
+```
+
+```{r plot}
+
+
+(
+    ggplot(
+        df,
+        mapping=aes(
+            x=density, 
+            # x="edginess",
+            y=citations_per_year,
+        )
+    )
+    + geom_point(
+        alpha=0.2,
+    )
+    + xlab("Density")
+    # + xlab("Asymmetry")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```
+
+
+```{r scale}
+
+df_z <- df %>% mutate(
+  df,
+  density_z = scale(density),
+  cpy_z = scale(citations_per_year),
+)
+
+# Filter to 2 stds, for both vars
+df_zf <- df_z %>% 
+  filter(
+    (
+      density_z >= -2
+      & 
+      # density_z <= 0
+      density <= median(df_z$density)
+    ),
+    (
+      cpy_z >= -2
+      &
+      cpy_z <= 0 # mean=0, and it might be the only way to see everything. But it also might exclude things; unfortunately this might need to be outsourced to a config and plots tweaked.
+    ) 
+  )
+
+print(median(df$density))
+```
+
+
+```{r plot2}
+
+(
+    ggplot(
+        df_zf,
+        mapping=aes(
+            # x=density_z, 
+            x=density, # NOTE that we filter by z-scale, but can still plot the orig values.
+            y=citations_per_year,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    # + xlab("Density z-scaled")
+    + xlab("Density")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+)
+
+```

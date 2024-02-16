@@ -4,11 +4,12 @@ import os
 import hydra
 from omegaconf import DictConfig
 
+from sciterra import Atlas
+from sciterra.vectorization.vectorizer import Vectorizer
 from sciterra.mapping.tracing import AtlasTracer
 from sciterra.mapping.cartography import pub_has_attributes, pub_has_fields_of_study
 
 class Experiment:
-
     def __init__(
         self,
         config: DictConfig,
@@ -30,8 +31,11 @@ class Experiment:
         self.tracer = AtlasTracer(
             atlas_dir = self.atlas_dir,
             atlas_center_bibtex = self.bibtex_fp,
+
             librarian_name = config.experiment.librarian.name,
             vectorizer_name = config.experiment.vectorizer.name,
+
+            librarian_kwargs = {k:v for k,v in config.experiment.librarian.kwargs.items() if v is not None},
             vectorizer_kwargs = {k:v for k,v in config.experiment.vectorizer.kwargs.items() if v is not None},
         )
 
@@ -47,11 +51,22 @@ class Experiment:
             and pub_has_fields_of_study(pub, rpcs.fields_of_study)
         )
 
+        call_size = crt.call_size if hasattr(crt, "call_size") else None
+
         self.tracer.expand_atlas(
             target_size = crt.target_size,
             max_failed_expansions = crt.max_failed_expansions,
             n_pubs_max = crt.n_pubs_max,
-            call_size = self.config.experiment.librarian.call_size,
+            call_size = call_size,
             record_pubs_per_update=True,
             require_func=require_func,
+            batch_size=crt.batch_size,
         )
+
+    @property
+    def atlas(self) -> Atlas:
+        return self.tracer.atlas
+    
+    @property
+    def vectorizer(self) -> Vectorizer:
+        return self.tracer.cartographer.vectorizer

@@ -1,0 +1,12 @@
+name: BOW
+
+# Since BOW uses Word2Vec for vocab, we use same kwargs
+kwargs:
+  corpus_path: null # path to training data/vocab
+  model_path: w2v.model # name of model to save/load; will be parsed into main config filepaths
+  vector_size: null # null defaults to 300
+  window: null # null defaults to 5
+  min_count: null # null defaults to 2
+  workers: null # null defaults to cpu_count()
+  epochs: null # null defaults to 10
+  tokenizer: null # null defaults to the sciterrra.vectorizer.preprocessing.custom_preprocess function. But we could define our own.

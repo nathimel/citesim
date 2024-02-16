@@ -1,14 +1,13 @@
+defaults:
+  - required_pub_conditions: dev
+  - _self_ # stuff below can override stuff above  
+
 target_size: 100
 max_failed_expansions: 2
 n_pubs_max: 10
 
-required_pub_conditions:
-  attributes:
-  # ALL of the following  
-    - abstract
-    - publication_date
-    - fields_of_study
+# for embed_documents; may be useful to reduce under memory constraints
+batch_size: 64
 
-  fields_of_study:
-  # ANY of the following; we could alternatively use center's fields_of_study
-    - Physics
+# API call size
+call_size: null

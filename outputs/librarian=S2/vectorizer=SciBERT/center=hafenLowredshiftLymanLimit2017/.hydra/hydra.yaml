@@ -106,12 +106,11 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - experiment.cartography.target_size=10000
-    - experiment.cartography.n_pubs_max=500
+    - experiment/vectorizer=SciBERT
   job:
-    name: build_atlas
+    name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000
+    override_dirname: experiment/vectorizer=SciBERT
     id: ???
     num: ???
     config_name: config
@@ -144,8 +143,11 @@ hydra:
     choices:
       experiment: dev
       experiment/cartography: dev
+      experiment/cartography/required_pub_conditions: dev
+      experiment/cartography/required_pub_conditions/fields_of_study: physics
+      experiment/cartography/required_pub_conditions/attributes: abs_pub_fields
       experiment/atlas: dev
-      experiment/vectorizer: scibert
+      experiment/vectorizer: SciBERT
       experiment/librarian: semanticscholar
       hydra/env: default
       hydra/callbacks: null
