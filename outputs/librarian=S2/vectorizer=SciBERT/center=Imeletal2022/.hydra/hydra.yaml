@@ -108,10 +108,11 @@ hydra:
     task:
     - experiment/vectorizer=SciBERT
     - experiment.atlas.center=Imeletal2022
+    - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment/vectorizer=SciBERT
+    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment/vectorizer=SciBERT
     id: ???
     num: ???
     config_name: config
@@ -143,6 +144,7 @@ hydra:
     output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=Imeletal2022
     choices:
       experiment: dev
+      experiment/plot: dev
       experiment/cartography: dev
       experiment/cartography/required_pub_conditions: dev
       experiment/cartography/required_pub_conditions/fields_of_study: physics

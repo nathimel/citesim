@@ -16,12 +16,14 @@ experiment:
       - publication_date
       - fields_of_study
       fields_of_study:
-      - Physics
+      - Linguistics
     target_size: 100
     max_failed_expansions: 2
     n_pubs_max: 10
     batch_size: 64
     call_size: null
+  plot:
+    max_density: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

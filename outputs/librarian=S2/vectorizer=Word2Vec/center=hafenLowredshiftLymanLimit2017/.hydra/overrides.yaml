@@ -1,1 +1,2 @@
 - experiment/vectorizer=Word2Vec
+- experiment.plot.max_density=100

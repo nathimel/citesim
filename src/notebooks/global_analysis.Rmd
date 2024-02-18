@@ -1,0 +1,221 @@
+---
+title: "global_analysis"
+author: "Nathaniel Imel"
+date: "2024-02-16"
+output: html_document
+---
+
+```{r setup}
+library(tidyverse)
+library(lme4)
+library(modelr)
+library(viridis)
+library(ggrepel)
+library(latex2exp)
+```
+
+
+```{r load data}
+df = read_csv("../../analysis_data/all_data.csv")
+head(df)
+```
+
+```{r scale}
+
+
+# TEMP: Filter first to frequent vals, this is disatisfying bandaid for BOW
+# df <- df %>% group_by(density) %>% filter(n() >= 50)
+# In fact, it disables viewing the other interesting ones. We might simply be unable to automatically facet, unless our data is already heavily transformed in a specific way for BOW/Word2Vec vectorizers vs. neural LM vecs
+
+
+df_grouped_z <- df %>% 
+  group_by(
+    vectorizer,
+    center
+  ) %>% 
+  mutate(
+    density_z = scale(density),
+    cpy_z = scale(citations_per_year),
+  )
+
+
+# Filter to 2 stds, for both vars
+df_grouped_zf <- df_grouped_z %>% 
+  filter(
+    (
+      density_z >= -2
+      & 
+      density_z <= 2
+      # density <= median(df_grouped_z$density)
+    ),
+    (
+      cpy_z >= -2
+      &
+      cpy_z <= 0 # mean=0, and it might be the only way to see everything. But it also might exclude things; unfortunately this might need to be outsourced to a config and plots tweaked.
+    ) 
+  )
+
+```
+
+```{r plot}
+
+(
+    ggplot(
+        df_grouped_zf,
+        mapping=aes(
+            x=density_z,
+            # x=density, # NOTE that we filter by z-scale, but can still plot the orig values.
+            y=citations_per_year,
+            # y=cpy_z,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    # + xlab("Density z-scaled")
+    + xlab("Density")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+    
+    # IMPORTANT: facet by the groupby variables, 
+    # This should make the distribution no longer bimodal.
+    + facet_grid(vectorizer ~ center)
+)
+
+```
+
+```{r plot2}
+# Use only one group.
+
+df_test <- df_grouped_zf %>% filter(
+  vectorizer == "SciBERT", 
+  center == "hafenLowredshiftLymanLimit2017"
+)
+
+(
+    ggplot(
+        df_test,
+        mapping=aes(
+            # x=density_z,
+            x=density, # NOTE that we filter by z-scale, but can still plot the orig values.
+            y=citations_per_year,
+            # y=cpy_z,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    # + xlab("Density z-scaled")
+    + xlab("Density")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+    
+ )
+
+```
+
+
+```{r plot3}
+
+
+df_test <- df_grouped_zf %>% filter(
+  vectorizer == "BOW", 
+  center == "hafenLowredshiftLymanLimit2017"
+)
+
+(
+    ggplot(
+        df_test,
+        mapping=aes(
+            # x=density_z,
+            x=density, # NOTE that we filter by z-scale, but can still plot the orig values.
+            y=citations_per_year,
+            # y=cpy_z,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    # + xlab("Density z-scaled")
+    + xlab("Density")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+    
+ )
+
+```
+
+
+```{r plot4}
+
+
+df_test <- df_grouped_zf %>% filter(
+  vectorizer == "Word2Vec", 
+  center == "hafenLowredshiftLymanLimit2017"
+)
+
+(
+    ggplot(
+        df_test,
+        mapping=aes(
+            # x=density_z,
+            x=density, # NOTE that we filter by z-scale, but can still plot the orig values.
+            y=citations_per_year,
+            # y=cpy_z,
+        )
+    )
+    + geom_density_2d_filled(
+        contour_var = "ndensity",
+        # alpha=0.2,
+    )
+    + scale_fill_viridis(option = "viridis", discrete = TRUE)
+    # + xlab("Density z-scaled")
+    + xlab("Density")
+    + ylab("Citations per year")
+    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    + geom_point(
+        alpha=0.05,
+        color="white",
+        size=1,
+    )    
+    + theme(
+        # axis_title_y=element_blank(),
+        axis.title=element_text(size=18),
+    )
+    
+ )
+
+```

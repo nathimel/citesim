@@ -1,5 +1,8 @@
 """Helper functions for transforming and visualizing atlas data for analysis."""
 
+import hydra
+import os
+
 import numpy as np
 import pandas as pd
 import plotnine as pn
@@ -59,7 +62,34 @@ def cpy_histogram(
 
     return cpy_hist    
 
+# R backend
+def call_r_2d_histograms(
+    df_fn: str,
+    save_dir: str = None,
+    **kwargs,
+) -> None:
+    """Run the backend R script `src/analysis/plot.R`, which created histograms of metrics vs. cpy, filled by density of data points. This plot is not available in plotnine.
+    
+    Args:
+        df_fn: the absolute path to the CSV containing the measurements resulting from `atlas_to_measurements`.
 
+        save_dir: the absolute path to the directory to save the plots. Default is the parent directory of `df_fn`.
+    """
+    if save_dir is None:
+        save_dir = os.path.dirname(df_fn)
+
+    # Process args
+    # cml_args = [f"--data_fn {df_fn}", f"--plot_dir {plot_dir}"]
+    cml_args = [df_fn, save_dir]
+    cml_kwargs = [f"--{key} {value}" for key, value in kwargs.items() if value is not None]
+    all_cml_args = " ".join(cml_args + cml_kwargs)
+
+    # Run the R script
+    chdir = f"cd {hydra.utils.get_original_cwd()}"
+    run_rscript = f"Rscript src/analysis/plot.R {all_cml_args}"
+    command = f"{chdir}; {run_rscript}"
+    os.system(f"echo '{command}'")
+    os.system(command)
 
 
 ##############################################################################
@@ -122,6 +152,7 @@ def atlas_to_measurements(
     df["citations_per_year"] = citations_per_year
 
     df = df[~np.isinf(df["density"])] # drop infs which occur for BOW vectorizer
+    # TODO what about other very high densities that result from close to 0?
 
     df.dropna(inplace=True, )     
 

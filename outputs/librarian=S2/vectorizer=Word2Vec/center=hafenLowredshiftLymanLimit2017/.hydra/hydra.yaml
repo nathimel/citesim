@@ -107,10 +107,11 @@ hydra:
     - hydra.mode=RUN
     task:
     - experiment/vectorizer=Word2Vec
+    - experiment.plot.max_density=100
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment/vectorizer=Word2Vec
+    override_dirname: experiment.plot.max_density=100,experiment/vectorizer=Word2Vec
     id: ???
     num: ???
     config_name: config
@@ -142,6 +143,7 @@ hydra:
     output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=Word2Vec/center=hafenLowredshiftLymanLimit2017
     choices:
       experiment: dev
+      experiment/plot: dev
       experiment/cartography: dev
       experiment/cartography/required_pub_conditions: dev
       experiment/cartography/required_pub_conditions/fields_of_study: physics

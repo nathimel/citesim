@@ -107,10 +107,11 @@ hydra:
     - hydra.mode=RUN
     task:
     - experiment/vectorizer=BOW
+    - experiment.plot.max_density=100
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment/vectorizer=BOW
+    override_dirname: experiment.plot.max_density=100,experiment/vectorizer=BOW
     id: ???
     num: ???
     config_name: config
@@ -142,6 +143,7 @@ hydra:
     output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=BOW/center=hafenLowredshiftLymanLimit2017
     choices:
       experiment: dev
+      experiment/plot: dev
       experiment/cartography: dev
       experiment/cartography/required_pub_conditions: dev
       experiment/cartography/required_pub_conditions/fields_of_study: physics

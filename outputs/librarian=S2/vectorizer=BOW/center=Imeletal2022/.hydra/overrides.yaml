@@ -1,2 +1,4 @@
 - experiment/vectorizer=BOW
 - experiment.atlas.center=Imeletal2022
+- experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
+- experiment.plot.max_density=100

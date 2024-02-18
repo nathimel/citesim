@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 
 import util
 from experiment import Experiment
-from analysis.plot import fields_histogram, cpy_histogram, atlas_to_measurements
+from analysis.plot import fields_histogram, cpy_histogram, atlas_to_measurements, call_r_2d_histograms
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
@@ -39,13 +39,13 @@ def main(config: DictConfig):
     )
 
     # Need to use R to get density plot
+    # TOOD: write a function in plot.py to do all this, and just takes args and kwargs about 
     df_fn = os.path.join(os.getcwd(), "all_data.csv")
-    plot_dir = os.path.join(os.getcwd())
-    chdir = f"cd {hydra.utils.get_original_cwd()}"
-    ex = f"Rscript src/analysis/plot.R {df_fn} {plot_dir}"
-    command = f"{chdir}; {ex}"
-    os.system(f"echo {command}")
-    os.system(command)
+    call_r_2d_histograms(
+        df_fn,
+        max_density=config.experiment.plot.max_density,
+    )
+
 
 
 if __name__ == "__main__":

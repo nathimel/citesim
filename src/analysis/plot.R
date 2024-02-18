@@ -1,27 +1,54 @@
 # Auxilliary R script to plot data, called by analysis.py. If plotnine ever matches ggplot's energy, this file won't need to exist.
 
 library(tidyverse)
-library(lme4)
-library(modelr)
+library(dplyr)
 library(viridis)
-library(ggrepel)
-library(latex2exp)
+library(argparse)
 
-# Parse cml args
 
-args <- commandArgs(trailingOnly = TRUE)
+# create parser object
+parser <- ArgumentParser()
 
-if (length(args) != 2) {
-  cat("Usage: Rscript my_script.R <path-to-analysis-csv> <path-to-save-plots> \n")
-  q("no", status = 1)
-}
-df_fn <- args[1] # abs path
-save_dir <- args[2]
+parser$add_argument(
+  "data_fn",
+  nargs=1, 
+  help="Path to CSV file containing atlas topography measurements."
+)
 
+parser$add_argument(
+  "save_dir",
+  nargs=1,
+  help="Path to directory to save plots."
+)
+
+parser$add_argument(
+  "--max_density",
+  type="double",
+  help="Drop all observations from plotting density for values of density greater than this value."
+)
+
+# TODO: add optional args for the std filtering
+
+args <- parser$parse_args()
+
+
+df_fn <- args$data_fn
+save_dir <- args$save_dir
+max_density <- args$max_density
 
 
 # Load data
 df <- read_csv(df_fn)
+
+# TODO: if max_density specified, drop rows with greater density values.
+# we could groupby and only do this for density, but for consistency we may as well just exclude those values from edginess too
+if (is.null(max_density)) {
+  max_density <- Inf
+}
+
+df <- df %>% filter(
+  density <= max_density
+)
 
 # Plot metric vs. cpy
 metric_vs_cpy <- function(metric) {
@@ -33,13 +60,11 @@ metric_vs_cpy <- function(metric) {
         metric_z = scale(.data[[metric]]),
         cpy_z = scale(citations_per_year),
     )
-
     # Filter to mean cpys
     df_z <- df_z %>%
         filter(
             cpy_z <= 0
         )
-
 
   df_zf <- df_z %>%
     filter(
@@ -72,6 +97,7 @@ metric_vs_cpy <- function(metric) {
       color="white",
       size=1,
     )
+    + ylim(0, NA)
     + theme(
       # axis_title_y=element_blank(),
       axis.title=element_text(size=18),

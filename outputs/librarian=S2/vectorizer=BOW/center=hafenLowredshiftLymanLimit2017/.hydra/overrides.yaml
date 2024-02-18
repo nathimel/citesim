@@ -1,1 +1,2 @@
 - experiment/vectorizer=BOW
+- experiment.plot.max_density=100

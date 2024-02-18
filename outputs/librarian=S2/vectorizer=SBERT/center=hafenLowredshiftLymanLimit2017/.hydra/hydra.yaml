@@ -142,6 +142,7 @@ hydra:
     output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SBERT/center=hafenLowredshiftLymanLimit2017
     choices:
       experiment: dev
+      experiment/plot: dev
       experiment/cartography: dev
       experiment/cartography/required_pub_conditions: dev
       experiment/cartography/required_pub_conditions/fields_of_study: physics
