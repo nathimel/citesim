@@ -62,6 +62,35 @@ def cpy_histogram(
 
     return cpy_hist    
 
+# TODO: refactor w above
+def density_histogram(
+    data: pd.DataFrame,
+    min_d = 1,
+    max_d = 100,
+) -> pn.ggplot:
+    """Get a histogram of density values, given a dataframe of measurements."""
+
+    df_f = data[(data["density"] >= min_d) & (data["density"] <= max_d)]
+
+    # Histogram of cpy
+    cpy_hist = (
+        pn.ggplot(
+            # df,
+            df_f,
+            mapping=pn.aes(x="density")
+        )
+        + pn.geom_histogram(bins=50)
+        + pn.scale_x_log10()
+        + pn.xlab("Density")
+        + pn.ylab(f"Count, total={len(df_f)}")
+        + pn.theme(
+            axis_title=pn.element_text(size=18)
+        )
+    )
+
+    return cpy_hist  
+
+
 # R backend
 def call_r_2d_histograms(
     df_fn: str,
@@ -96,6 +125,7 @@ def call_r_2d_histograms(
 # Data transforms
 ##############################################################################
 
+# TODO: should we move this into a separate file?
 def atlas_to_measurements(
     atl: Atlas,
     vectorizer: Vectorizer,

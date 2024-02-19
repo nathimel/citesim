@@ -17,10 +17,10 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Linguistics
-    target_size: 10000
+    target_size: 100
     max_failed_expansions: 2
-    n_pubs_max: 500
-    batch_size: 8
+    n_pubs_max: 10
+    batch_size: 64
     call_size: null
   plot:
     max_density: null

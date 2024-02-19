@@ -1,6 +1,3 @@
 - experiment/vectorizer=GPT2
 - experiment.cartography.target_size=10000
 - experiment.cartography.n_pubs_max=500
-- experiment.cartography.batch_size=8
-- experiment.atlas.center=hafenLowredshiftLymanLimit2017
-- experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]

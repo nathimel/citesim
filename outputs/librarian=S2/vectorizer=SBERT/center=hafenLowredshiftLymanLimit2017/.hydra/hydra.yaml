@@ -107,10 +107,12 @@ hydra:
     - hydra.mode=RUN
     task:
     - experiment/vectorizer=SBERT
+    - experiment.cartography.target_size=10000
+    - experiment.cartography.n_pubs_max=500
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment/vectorizer=SBERT
+    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=SBERT
     id: ???
     num: ???
     config_name: config

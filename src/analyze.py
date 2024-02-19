@@ -7,7 +7,9 @@ from omegaconf import DictConfig
 
 import util
 from experiment import Experiment
-from analysis.plot import fields_histogram, cpy_histogram, atlas_to_measurements, call_r_2d_histograms
+# from analysis.plot import fields_histogram, cpy_histogram, atlas_to_measurements, call_r_2d_histograms
+
+from analysis import plot
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
@@ -23,10 +25,10 @@ def main(config: DictConfig):
 
     util.save_plot(
         "fields_histogram.png",
-        fields_histogram(atl),
+        plot.fields_histogram(atl),
     )
 
-    df = atlas_to_measurements(
+    df = plot.atlas_to_measurements(
         atl,
         vectorizer=exp.vectorizer,
         fields_of_study=exp.config.experiment.cartography.required_pub_conditions.fields_of_study
@@ -35,13 +37,18 @@ def main(config: DictConfig):
 
     util.save_plot(
         "cpy_histogram.png",
-        cpy_histogram(df),
+        plot.cpy_histogram(df),
+    )
+
+    util.save_plot(
+        "density_histogram.png",
+        plot.density_histogram(df),
     )
 
     # Need to use R to get density plot
     # TOOD: write a function in plot.py to do all this, and just takes args and kwargs about 
     df_fn = os.path.join(os.getcwd(), "all_data.csv")
-    call_r_2d_histograms(
+    plot.call_r_2d_histograms(
         df_fn,
         max_density=config.experiment.plot.max_density,
     )
