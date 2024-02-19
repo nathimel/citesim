@@ -6,7 +6,7 @@ experiment:
   vectorizer:
     name: Word2Vec
     kwargs:
-      corpus_path: null
+      corpus_path: /Users/nathanielimel/uci/projects/citesim/data/corpora/astro_sciterra.txt
       model_path: w2v.model
       vector_size: null
       window: null
@@ -24,13 +24,13 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Physics
-    target_size: 100
+    target_size: 10000
     max_failed_expansions: 2
-    n_pubs_max: 10
+    n_pubs_max: 500
     batch_size: 64
     call_size: null
   plot:
-    max_density: 100
+    max_density: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

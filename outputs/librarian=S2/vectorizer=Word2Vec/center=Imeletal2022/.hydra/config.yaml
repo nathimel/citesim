@@ -1,0 +1,41 @@
+experiment:
+  librarian:
+    name: S2
+    kwargs:
+      api_key_fn: null
+  vectorizer:
+    name: Word2Vec
+    kwargs:
+      corpus_path: /Users/nathanielimel/uci/projects/citesim/data/corpora/ling_sciterra.txt
+      model_path: w2v.model
+      vector_size: null
+      window: null
+      min_count: null
+      workers: null
+      epochs: null
+      tokenizer: null
+  atlas:
+    center: Imeletal2022
+  cartography:
+    required_pub_conditions:
+      attributes:
+      - abstract
+      - publication_date
+      - fields_of_study
+      fields_of_study:
+      - Linguistics
+    target_size: 10000
+    max_failed_expansions: 2
+    n_pubs_max: 500
+    batch_size: 64
+    call_size: null
+  plot:
+    max_density: null
+seed: 42
+filepaths:
+  atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib
+  vectorizer_subdir: librarian=${experiment.librarian.name}/vectorizer=${experiment.vectorizer.name}
+  experiment_subdir: ${filepaths.vectorizer_subdir}/center=${experiment.atlas.center}
+  leaf_subdir: ${filepaths.experiment_subdir}
+  hydra_run_root: outputs
+  hydra_sweep_root: multirun
