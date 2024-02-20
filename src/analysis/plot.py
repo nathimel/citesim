@@ -92,6 +92,7 @@ def density_histogram(
 
 
 # R backend
+# TODO: consider adding the identity of pubs in the data, so we can visualize where the center is in the distribution.
 def call_r_2d_histograms(
     df_fn: str,
     save_dir: str = None,
@@ -169,22 +170,31 @@ def atlas_to_measurements(
         kernel_size=kernel_size,
     )
 
-    # get citations
+    # Get citations
     citations_per_year = [ 
         atl[id].citation_count / (max_year - atl[id].publication_date.year) if (atl[id].publication_date.year < max_year and atl[id].citation_count is not None) else 0.
         for id in converged_pub_ids
     ]
+
+    # Annotate the center (this feels inefficient, but oh well)
+    is_center = [identifier == atl.center for identifier in converged_pub_ids]
+
+    # TODO: why no center in GPT2 Imeletal atlas?
+    # Because not converged! ...
+    # This suggests that I need to think more about the overall upshot figure, and that it prob shouldn't be GPT2. How can it be that the center pub hasn't converged?
+    breakpoint()
 
     df = pd.DataFrame(
         measurements,
         columns=["density", "edginess"],
     )
     df["citations_per_year"] = citations_per_year
+    df["is_center"] = is_center
 
     df = df[~np.isinf(df["density"])] # drop infs which occur for BOW vectorizer
     # TODO what about other very high densities that result from close to 0?
 
-    df.dropna(inplace=True, )     
+    df.dropna(inplace=True, )
 
     return df
 

@@ -55,25 +55,35 @@ metric_vs_cpy <- function(metric) {
   # Filter to 2 stds, for both vars
   metric_z <- paste(metric, "_z", sep="")
 
-    df_z <- df %>% mutate(
-        df,
-        metric_z = scale(.data[[metric]]),
-        cpy_z = scale(citations_per_year),
-    )
-    # Filter to mean cpys
-    df_z <- df_z %>%
-        filter(
-            cpy_z <= 0
-        )
+  df_z <- df %>% mutate(
+    df,
+    metric_z = scale(.data[[metric]]),
+    cpy_z = scale(citations_per_year),
+  )
 
-  df_zf <- df_z %>%
+  # Get the center to label
+  df_center <- df_z %>% filter(
+    is_center == TRUE
+  )
+  print("DF CENTER:")
+  print(df_center)  
+  
+  # Filter to mean cpys
+  # TODO: sometimes the center will have more than mean!
+  # Maybe do +1 std?
+  df_z <- df_z %>%
     filter(
-      (
-        metric_z >= -2 
-        & 
-        metric_z <= 2
-      ),
+      cpy_z <= .05
     )
+
+  df_zf <- df_z %>% filter(
+    (
+      metric_z >= -2 
+      & 
+      metric_z <= 3
+    ),
+  )
+  
   plot = (
     ggplot(
       df_zf,
@@ -97,6 +107,20 @@ metric_vs_cpy <- function(metric) {
       color="white",
       size=1,
     )
+    
+    # Annotate the center
+    + geom_label(
+      data=df_center,
+      mapping=aes(label="center publication"),
+      nudge_y = -.2,
+    )
+    + geom_point(
+      data=df_center,
+      # shape=4,
+      size=6,
+      color="red",
+    )
+    
     + ylim(0, NA)
     + theme(
       # axis_title_y=element_blank(),

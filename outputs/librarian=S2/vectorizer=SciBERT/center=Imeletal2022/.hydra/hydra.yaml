@@ -107,12 +107,14 @@ hydra:
     - hydra.mode=RUN
     task:
     - experiment/vectorizer=SciBERT
+    - experiment.cartography.target_size=10000
+    - experiment.cartography.n_pubs_max=500
     - experiment.atlas.center=Imeletal2022
     - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment/vectorizer=SciBERT
+    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment.cartography.target_size=10000,experiment/vectorizer=SciBERT
     id: ???
     num: ???
     config_name: config
