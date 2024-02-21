@@ -181,8 +181,11 @@ def atlas_to_measurements(
 
     # TODO: why no center in GPT2 Imeletal atlas?
     # Because not converged! ...
-    # This suggests that I need to think more about the overall upshot figure, and that it prob shouldn't be GPT2. How can it be that the center pub hasn't converged?
-    breakpoint()
+    # This suggests that I need to think more about the overall upshot figure, and that it prob shouldn't be GPT2. How can it be that the center pub hasn't converged? 
+    # breakpoint()
+    if not any(is_center):
+        import warnings
+        warnings.warn(f"The center publication is not within the set of convered publications.")
 
     df = pd.DataFrame(
         measurements,

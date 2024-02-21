@@ -62,11 +62,12 @@ metric_vs_cpy <- function(metric) {
   )
 
   # Get the center to label
+  # N.B.: if the python script raised a warning, this dataframe will be empty and no point will be plotted.
   df_center <- df_z %>% filter(
     is_center == TRUE
   )
-  print("DF CENTER:")
-  print(df_center)  
+  # print("DF CENTER:")
+  # print(df_center)  
   
   # Filter to mean cpys
   # TODO: sometimes the center will have more than mean!
@@ -80,7 +81,7 @@ metric_vs_cpy <- function(metric) {
     (
       metric_z >= -2 
       & 
-      metric_z <= 3
+      metric_z <= 2
     ),
   )
   
@@ -101,7 +102,13 @@ metric_vs_cpy <- function(metric) {
     # + xlab("Density z-scaled")
     + xlab(str_to_title(metric))
     + ylab("Citations per year")
+
+    # Local linear regression
     + geom_smooth(color="orange", size=2, method="loess", span=.3)
+
+    # Running binned median
+    + stat_summary_bin(fun = "median", geom = "smooth", bins = 10)
+
     + geom_point(
       alpha=0.05,
       color="white",

@@ -39,7 +39,11 @@ df = read_csv("df_filtered.csv")
     + xlab("Density")
     # + xlab("Asymmetry")
     + ylab("Citations per year")
-    + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    # + geom_smooth(color="orange", size=2, method="loess", span=.3)
+    
+    # Try running median with stat_summary_bin
+    + stat_summary_bin(fun = "median", geom = "smooth", bins=10)
+    
     + theme(
         # axis_title_y=element_blank(),
         axis.title=element_text(size=18),

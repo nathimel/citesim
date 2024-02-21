@@ -1,3 +1,4 @@
 - experiment/vectorizer=SBERT
+- experiment.cartography.target_size=10000
+- experiment.cartography.n_pubs_max=500
 - experiment.atlas.center=Imeletal2022
-- experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
