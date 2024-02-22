@@ -60,6 +60,13 @@ metric_vs_cpy <- function(metric) {
     metric_z = scale(.data[[metric]]),
     cpy_z = scale(citations_per_year),
   )
+  
+  # Add log transform
+  df_z <- df_z %>% mutate(
+    df_z,
+    logcpy = log10( citations_per_year ),
+    logcpy_z = log10( cpy_z ),
+  )
 
   # Get the center to label
   # N.B.: if the python script raised a warning, this dataframe will be empty and no point will be plotted.
@@ -74,12 +81,12 @@ metric_vs_cpy <- function(metric) {
   # Maybe do +1 std?
   df_z <- df_z %>%
     filter(
-      cpy_z <= .05
+      cpy_z <= 0
     )
 
   df_zf <- df_z %>% filter(
     (
-      metric_z >= -2 
+      metric_z >= -2
       & 
       metric_z <= 2
     ),
@@ -91,7 +98,8 @@ metric_vs_cpy <- function(metric) {
       mapping=aes(
         # x=density_z, 
         x=.data[[metric]], # NOTE that we filter by z-scale, but can still plot the orig values.
-        y=citations_per_year
+        # y=citations_per_year
+        y=logcpy,
       )
     )
     + geom_density_2d_filled(
@@ -101,7 +109,8 @@ metric_vs_cpy <- function(metric) {
     + scale_fill_viridis(option = "viridis", discrete = TRUE)
     # + xlab("Density z-scaled")
     + xlab(str_to_title(metric))
-    + ylab("Citations per year")
+    # + ylab("Citations per year")
+    + ylab("Log Citations per year")
 
     # Local linear regression
     + geom_smooth(color="orange", size=2, method="loess", span=.3)

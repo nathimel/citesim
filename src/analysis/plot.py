@@ -65,8 +65,8 @@ def cpy_histogram(
 # TODO: refactor w above
 def density_histogram(
     data: pd.DataFrame,
-    min_d = 1,
-    max_d = 100,
+    min_d = -np.inf,
+    max_d = np.inf,
 ) -> pn.ggplot:
     """Get a histogram of density values, given a dataframe of measurements."""
 
