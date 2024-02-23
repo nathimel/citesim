@@ -16,7 +16,7 @@ experiment:
       - publication_date
       - fields_of_study
       fields_of_study:
-      - Linguistics
+      - Physics
     target_size: 10000
     max_failed_expansions: 2
     n_pubs_max: 500

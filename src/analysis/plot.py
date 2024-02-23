@@ -80,7 +80,7 @@ def density_histogram(
             mapping=pn.aes(x="density")
         )
         + pn.geom_histogram(bins=50)
-        + pn.scale_x_log10()
+        # + pn.scale_x_log10() # probably don't do this!
         + pn.xlab("Density")
         + pn.ylab(f"Count, total={len(df_f)}")
         + pn.theme(

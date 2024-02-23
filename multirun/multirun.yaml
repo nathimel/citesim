@@ -106,13 +106,14 @@ hydra:
     hydra:
     - hydra.mode=MULTIRUN
     task:
-    - experiment/vectorizer=SciBERT,SBERT,GPT2
+    - experiment/vectorizer=SBERT,SciBERT,GPT2
     - experiment.cartography.target_size=10000
     - experiment.cartography.n_pubs_max=500
+    - experiment.atlas.center=Imeletal2022
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=SciBERT,SBERT,GPT2
+    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=SBERT,SciBERT,GPT2
     id: ???
     num: ???
     config_name: config
@@ -172,7 +173,7 @@ experiment:
     kwargs:
       device: mps
   atlas:
-    center: hafenLowredshiftLymanLimit2017
+    center: Imeletal2022
   cartography:
     required_pub_conditions:
       attributes:
