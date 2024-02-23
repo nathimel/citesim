@@ -27,6 +27,14 @@ parser$add_argument(
   help="Drop all observations from plotting density for values of density greater than this value."
 )
 
+parser$add_argument(
+  "--log_cpy",
+  nargs=1,
+  type="logical",
+  help="Whether to plot the y-axis, citations per year, on a log scale.",
+  default=FALSE
+)
+
 # TODO: add optional args for the std filtering
 
 args <- parser$parse_args()
@@ -35,7 +43,7 @@ args <- parser$parse_args()
 df_fn <- args$data_fn
 save_dir <- args$save_dir
 max_density <- args$max_density
-
+log_cpy <- args$log_cpy
 
 # Load data
 df <- read_csv(df_fn)
@@ -91,6 +99,11 @@ metric_vs_cpy <- function(metric) {
       metric_z <= 2
     ),
   )
+
+  y <- "citations_per_year"
+  if (log_cpy) {
+    y <- "logcpy"
+  }
   
   plot = (
     ggplot(
@@ -99,7 +112,7 @@ metric_vs_cpy <- function(metric) {
         # x=density_z, 
         x=.data[[metric]], # NOTE that we filter by z-scale, but can still plot the orig values.
         # y=citations_per_year
-        y=logcpy,
+        y=.data[[y]],
       )
     )
     + geom_density_2d_filled(
@@ -110,7 +123,7 @@ metric_vs_cpy <- function(metric) {
     # + xlab("Density z-scaled")
     + xlab(str_to_title(metric))
     # + ylab("Citations per year")
-    + ylab("Log Citations per year")
+    + ylab("Citations per year")
 
     # Local linear regression
     + geom_smooth(color="orange", size=2, method="loess", span=.3)

@@ -7,6 +7,7 @@ experiment:
     name: SciBERT
     kwargs:
       device: mps
+      corpus_path: /Users/nathanielimel/uci/projects/citesim/data/corpora/ling_sciterra.txt
   atlas:
     center: Imeletal2022
   cartography:
@@ -24,6 +25,7 @@ experiment:
     call_size: null
   plot:
     max_density: null
+    log_cpy: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib
