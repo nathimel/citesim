@@ -31,7 +31,9 @@ def main(config: DictConfig):
     df = plot.atlas_to_measurements(
         atl,
         vectorizer=exp.vectorizer,
-        fields_of_study=exp.config.experiment.cartography.required_pub_conditions.fields_of_study
+        fields_of_study=exp.config.experiment.cartography.required_pub_conditions.fields_of_study,
+        con_d=config.experiment.plot.con_d,
+        update_ind=config.experiment.plot.update_ind,
     )
     df.to_csv("all_data.csv", index=False)
 

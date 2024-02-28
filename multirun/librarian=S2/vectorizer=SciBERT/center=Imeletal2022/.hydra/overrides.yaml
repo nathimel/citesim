@@ -1,4 +1,5 @@
-- experiment/vectorizer=SciBERT
-- experiment.cartography.target_size=10000
-- experiment.cartography.n_pubs_max=500
+- experiment.vectorizer.name=SciBERT
 - experiment.atlas.center=Imeletal2022
+- experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
+- experiment.plot.update_ind=null
+- experiment.plot.con_d=0.27

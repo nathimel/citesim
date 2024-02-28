@@ -106,13 +106,12 @@ hydra:
     hydra:
     - hydra.mode=MULTIRUN
     task:
-    - experiment/vectorizer=GPT2
-    - experiment.cartography.target_size=10000
-    - experiment.cartography.n_pubs_max=500
+    - experiment.vectorizer.name=GPT2
+    - experiment.atlas.center=hafenLowredshiftLymanLimit2017
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=GPT2
+    override_dirname: ''
     id: '2'
     num: 2
     config_name: config
@@ -150,7 +149,7 @@ hydra:
       experiment/cartography/required_pub_conditions/fields_of_study: physics
       experiment/cartography/required_pub_conditions/attributes: abs_pub_fields
       experiment/atlas: dev
-      experiment/vectorizer: GPT2
+      experiment/vectorizer: scibert
       experiment/librarian: semanticscholar
       hydra/env: default
       hydra/callbacks: null

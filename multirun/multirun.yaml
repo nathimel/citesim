@@ -106,14 +106,15 @@ hydra:
     hydra:
     - hydra.mode=MULTIRUN
     task:
-    - experiment/vectorizer=SBERT,SciBERT,GPT2
-    - experiment.cartography.target_size=10000
-    - experiment.cartography.n_pubs_max=500
+    - experiment.vectorizer.name=SciBERT
     - experiment.atlas.center=Imeletal2022
+    - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
+    - experiment.plot.update_ind=null
+    - experiment.plot.con_d=0.27
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=SBERT,SciBERT,GPT2
+    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment.plot.con_d=0.27,experiment.plot.update_ind=null
     id: ???
     num: ???
     config_name: config
@@ -181,14 +182,17 @@ experiment:
       - publication_date
       - fields_of_study
       fields_of_study:
-      - Physics
-    target_size: 10000
+      - Linguistics
+    target_size: 100
     max_failed_expansions: 2
-    n_pubs_max: 500
+    n_pubs_max: 10
     batch_size: 64
     call_size: null
   plot:
     max_density: null
+    log_cpy: null
+    con_d: 0.27
+    update_ind: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

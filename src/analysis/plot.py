@@ -130,7 +130,8 @@ def call_r_2d_histograms(
 def atlas_to_measurements(
     atl: Atlas,
     vectorizer: Vectorizer,
-    con_d: int = 1,
+    con_d: float = None,
+    update_ind: int = None,
     kernel_size =  16, # TODO: find a principled way of selecting this value.
     fields_of_study = None,
     max_year: int = 2023, # consider 2022
@@ -142,17 +143,38 @@ def atlas_to_measurements(
 
         vectorizer: the Vectorizer to use to compute density and edginess
 
-        con_d: the inverse index for the second axis of the array `atl.history['kernel_size']`, representing the degree of convergence. For details about this array see `sciterra.mapping.cartography.Cartographer.converged_kernel_size`. Default is 1, which means we will filter to all publications that have not changed neighborhoods up to `kernel_size` up until the very last update. If 2, then up to the second to last update, etc.
+        con_d: float in [0,1] representing the percentage of the history. 
+            - If 0, then `update_ind` = max_update, and so `converged_filter` will include all columns of `atl.history['kernel_size']`, i.e., the weakest constraint for convergence.
+            - If 1, then `update_ind` = 0, and so `converged_filter` will include only the last column of `atl.history['kernel_size']`.
+            - If 0.5, then `update_ind = max_update - int(con_d * max_update)`, so `converged_filter` will include up to (the first) half of the columnns of `atl.history['kernel_size']`
+
+        update_ind: int representing the update number after which to publications must have not changed. If specified, overrides `con_d`, and the equivalent `con_d` will be set.
+
+        This will be used to compute the inverse index for the second axis of the array `atl.history['kernel_size']`, representing the degree of convergence. For details about this array see `sciterra.mapping.cartography.Cartographer.converged_kernel_size`. Default is 1, which means we will filter to all publications that have not changed neighborhoods up to `kernel_size` up until the very last update. If 2, then up to the second to last update, etc.
 
         kernel_size: the minimum required size of the neighborhood that we will require to not have changed, w.r.t. `cond_d`. Default is 16.
 
     """
     kernels = atl.history['kernel_size'] # shape `(num_pubs, max_update)`, where `max_update` is typically the total number of updates if this function is called after the atlas has been sufficiently built out.
+    max_update = kernels.shape[1]
+
+    if sum([item is not None for item in [con_d, update_ind]]) != 1:
+        raise ValueError(f"You must specify either `con_d` or `update_ind`. Received: `con_d`={con_d}, `update_ind`={update_ind}.")
+
+    if update_ind is not None:
+        # We're just doing this so we can print the update ind
+        con_d = np.round((max_update - update_ind) / max_update, 2)
+    else:
+        update_ind = max_update - int(con_d * max_update)
 
     # Get all publications that have not changed neighborhoods up to kernel_size for the last con_d updates
-    converged_filter = kernels[:, -con_d] >= kernel_size
+    converged_filter = kernels[:, update_ind] >= kernel_size
     ids = np.array(atl.projection.index_to_identifier)
     converged_pub_ids = ids[converged_filter]
+
+    print(
+        f"Convergence degree {con_d} (update {update_ind} / {max_update} total) yields {len(converged_pub_ids)} ids out of {len(atl)} total ids."
+    )
 
     # Optionally filter only to `field_of_study` publications
     # TODO: check this logic is the same as in cartography
@@ -179,10 +201,6 @@ def atlas_to_measurements(
     # Annotate the center (this feels inefficient, but oh well)
     is_center = [identifier == atl.center for identifier in converged_pub_ids]
 
-    # TODO: why no center in GPT2 Imeletal atlas?
-    # Because not converged! ...
-    # This suggests that I need to think more about the overall upshot figure, and that it prob shouldn't be GPT2. How can it be that the center pub hasn't converged? 
-    # breakpoint()
     if not any(is_center):
         import warnings
         warnings.warn(f"The center publication is not within the set of convered publications.")
@@ -198,6 +216,8 @@ def atlas_to_measurements(
     # TODO what about other very high densities that result from close to 0?
 
     df.dropna(inplace=True, )
+
+    print(f"There are {len(df)} total observations after filtering.")
 
     return df
 

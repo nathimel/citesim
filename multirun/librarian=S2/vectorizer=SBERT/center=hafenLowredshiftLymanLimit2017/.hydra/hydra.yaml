@@ -106,15 +106,14 @@ hydra:
     hydra:
     - hydra.mode=MULTIRUN
     task:
-    - experiment/vectorizer=SBERT
-    - experiment.cartography.target_size=10000
-    - experiment.cartography.n_pubs_max=500
+    - experiment.vectorizer.name=SBERT
+    - experiment.atlas.center=hafenLowredshiftLymanLimit2017
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=SBERT
-    id: '1'
-    num: 1
+    override_dirname: ''
+    id: '0'
+    num: 0
     config_name: config
     env_set: {}
     env_copy: []
@@ -150,7 +149,7 @@ hydra:
       experiment/cartography/required_pub_conditions/fields_of_study: physics
       experiment/cartography/required_pub_conditions/attributes: abs_pub_fields
       experiment/atlas: dev
-      experiment/vectorizer: SBERT
+      experiment/vectorizer: scibert
       experiment/librarian: semanticscholar
       hydra/env: default
       hydra/callbacks: null

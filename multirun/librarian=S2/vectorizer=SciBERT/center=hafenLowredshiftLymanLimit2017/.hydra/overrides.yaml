@@ -1,3 +1,2 @@
-- experiment/vectorizer=SciBERT
-- experiment.cartography.target_size=10000
-- experiment.cartography.n_pubs_max=500
+- experiment.vectorizer.name=SciBERT
+- experiment.atlas.center=hafenLowredshiftLymanLimit2017
