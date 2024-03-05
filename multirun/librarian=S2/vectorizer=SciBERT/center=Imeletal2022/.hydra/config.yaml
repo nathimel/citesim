@@ -25,8 +25,7 @@ experiment:
   plot:
     max_density: null
     log_cpy: null
-    con_d: 0.27
-    update_ind: null
+    con_d: 10
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

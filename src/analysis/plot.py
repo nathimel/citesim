@@ -9,10 +9,11 @@ import plotnine as pn
 
 from collections import Counter
 
-import util
 
 from sciterra import Atlas, Cartographer
 from sciterra.vectorization.vectorizer import Vectorizer
+from sciterra.mapping.tracing import search_converged_ids
+
 
 ##############################################################################
 # Plotting
@@ -130,8 +131,7 @@ def call_r_2d_histograms(
 def atlas_to_measurements(
     atl: Atlas,
     vectorizer: Vectorizer,
-    con_d: float = None,
-    update_ind: int = None,
+    num_pubs_added: int = 1000, 
     kernel_size =  16, # TODO: find a principled way of selecting this value.
     fields_of_study = None,
     max_year: int = 2023, # consider 2022
@@ -143,41 +143,20 @@ def atlas_to_measurements(
 
         vectorizer: the Vectorizer to use to compute density and edginess
 
-        con_d: float in [0,1] representing the percentage of the history. 
-            - If 0, then `update_ind` = max_update, and so `converged_filter` will include all columns of `atl.history['kernel_size']`, i.e., the weakest constraint for convergence.
-            - If 1, then `update_ind` = 0, and so `converged_filter` will include only the last column of `atl.history['kernel_size']`.
-            - If 0.5, then `update_ind = max_update - int(con_d * max_update)`, so `converged_filter` will include up to (the first) half of the columnns of `atl.history['kernel_size']`
+        con_d: a reverse index. This represents a convergence degree, in the sense that it is the number of updates before the last udpate to require that a publication's neighborhood has not changed identity of composition.
 
-        update_ind: int representing the update number after which to publications must have not changed. If specified, overrides `con_d`, and the equivalent `con_d` will be set.
+        num_pubs_added: propagated to `search_converged_ids`
 
-        This will be used to compute the inverse index for the second axis of the array `atl.history['kernel_size']`, representing the degree of convergence. For details about this array see `sciterra.mapping.cartography.Cartographer.converged_kernel_size`. Default is 1, which means we will filter to all publications that have not changed neighborhoods up to `kernel_size` up until the very last update. If 2, then up to the second to last update, etc.
-
-        kernel_size: the minimum required size of the neighborhood that we will require to not have changed, w.r.t. `cond_d`. Default is 16.
-
+        kernel_size: propagated to `search_converged_ids`
     """
-    kernels = atl.history['kernel_size'] # shape `(num_pubs, max_update)`, where `max_update` is typically the total number of updates if this function is called after the atlas has been sufficiently built out.
-    max_update = kernels.shape[1]
 
-    if sum([item is not None for item in [con_d, update_ind]]) != 1:
-        raise ValueError(f"You must specify either `con_d` or `update_ind`. Received: `con_d`={con_d}, `update_ind`={update_ind}.")
-
-    if update_ind is not None:
-        # We're just doing this so we can print the update ind
-        con_d = np.round((max_update - update_ind) / max_update, 2)
-    else:
-        update_ind = max_update - int(con_d * max_update)
-
-    # Get all publications that have not changed neighborhoods up to kernel_size for the last con_d updates
-    converged_filter = kernels[:, update_ind] >= kernel_size
-    ids = np.array(atl.projection.index_to_identifier)
-    converged_pub_ids = ids[converged_filter]
-
-    print(
-        f"Convergence degree {con_d} (update {update_ind} / {max_update} total) yields {len(converged_pub_ids)} ids out of {len(atl)} total ids."
+    converged_pub_ids = search_converged_ids(
+        atl, 
+        num_pubs_added=num_pubs_added, 
+        kernel_size=kernel_size,
     )
 
     # Optionally filter only to `field_of_study` publications
-    # TODO: check this logic is the same as in cartography
     if fields_of_study is not None:
         converged_pub_ids = [id for id in converged_pub_ids if any(fld in atl[id].fields_of_study for fld in atl[id].fields_of_study)]
 
@@ -203,7 +182,7 @@ def atlas_to_measurements(
 
     if not any(is_center):
         import warnings
-        warnings.warn(f"The center publication is not within the set of convered publications.")
+        warnings.warn(f"The center publication is not within the set of converged publications.")
 
     df = pd.DataFrame(
         measurements,

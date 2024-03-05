@@ -107,7 +107,6 @@ hydra:
     - hydra.mode=MULTIRUN
     task:
     - experiment.vectorizer.name=SBERT
-    - experiment.atlas.center=hafenLowredshiftLymanLimit2017
   job:
     name: analyze
     chdir: true

@@ -109,12 +109,10 @@ hydra:
     - experiment.vectorizer.name=SciBERT
     - experiment.atlas.center=Imeletal2022
     - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
-    - experiment.plot.update_ind=null
-    - experiment.plot.con_d=0.27
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment.plot.con_d=0.27,experiment.plot.update_ind=null
+    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
     id: '0'
     num: 0
     config_name: config

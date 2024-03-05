@@ -107,14 +107,14 @@ hydra:
     - hydra.mode=MULTIRUN
     task:
     - experiment.vectorizer.name=SciBERT
-    - experiment.atlas.center=Imeletal2022
-    - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
-    - experiment.plot.update_ind=null
-    - experiment.plot.con_d=0.27
+    - experiment.atlas.center=Ololube2012
+    - experiment.cartography.required_pub_conditions.fields_of_study=[Education]
+    - experiment.cartography.target_size=30000
+    - experiment.cartography.n_pubs_max=500
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment.plot.con_d=0.27,experiment.plot.update_ind=null
+    override_dirname: experiment.cartography.n_pubs_max=500,experiment.cartography.required_pub_conditions.fields_of_study=[Education],experiment.cartography.target_size=30000
     id: ???
     num: ???
     config_name: config
@@ -174,7 +174,7 @@ experiment:
     kwargs:
       device: mps
   atlas:
-    center: Imeletal2022
+    center: Ololube2012
   cartography:
     required_pub_conditions:
       attributes:
@@ -182,17 +182,16 @@ experiment:
       - publication_date
       - fields_of_study
       fields_of_study:
-      - Linguistics
-    target_size: 100
+      - Education
+    target_size: 30000
     max_failed_expansions: 2
-    n_pubs_max: 10
+    n_pubs_max: 500
     batch_size: 64
     call_size: null
   plot:
     max_density: null
     log_cpy: null
-    con_d: 0.27
-    update_ind: null
+    con_d: 10
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

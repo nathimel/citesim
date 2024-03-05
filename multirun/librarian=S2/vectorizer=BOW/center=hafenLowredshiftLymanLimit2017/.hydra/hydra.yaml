@@ -108,14 +108,14 @@ hydra:
     task:
     - experiment/vectorizer=BOW
     - experiment.cartography.target_size=10000
-    - experiment.cartography.n_pubs_max=500
+    - experiment.cartography.n_pubs_max=10
     - +experiment.vectorizer.kwargs.corpus_path=/Users/nathanielimel/uci/projects/citesim/data/corpora/astro_sciterra.txt
   job:
-    name: analyze
+    name: build_atlas
     chdir: true
-    override_dirname: +experiment.vectorizer.kwargs.corpus_path=/Users/nathanielimel/uci/projects/citesim/data/corpora/astro_sciterra.txt,experiment.cartography.n_pubs_max=500,experiment.cartography.target_size=10000,experiment/vectorizer=BOW
-    id: '1'
-    num: 1
+    override_dirname: +experiment.vectorizer.kwargs.corpus_path=/Users/nathanielimel/uci/projects/citesim/data/corpora/astro_sciterra.txt,experiment.cartography.n_pubs_max=10,experiment.cartography.target_size=10000,experiment/vectorizer=BOW
+    id: '0'
+    num: 0
     config_name: config
     env_set: {}
     env_copy: []
