@@ -1,4 +1,0 @@
-- experiment/vectorizer=Word2Vec
-- experiment.cartography.target_size=10000
-- experiment.cartography.n_pubs_max=500
-- experiment.vectorizer.kwargs.corpus_path=/Users/nathanielimel/uci/projects/citesim/data/corpora/astro_sciterra.txt
