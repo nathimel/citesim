@@ -1,3 +1,2 @@
 max_density: null # BOW and Word2Vec should be plotted with a cutoff
 log_cpy: null # whether to plot cpy on log scale
-con_d: 10 # TODO: move into an analysis config!
