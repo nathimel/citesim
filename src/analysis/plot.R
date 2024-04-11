@@ -87,9 +87,10 @@ metric_vs_cpy <- function(metric) {
   # Filter to mean cpys
   # TODO: sometimes the center will have more than mean!
   # Maybe do +1 std?
+  # N.B.: physics, but no others, need +1 std for helpful visualization. This suggests we should outsource to config. 
   df_z <- df_z %>%
     filter(
-      cpy_z <= 0
+      cpy_z <= 1
     )
 
   df_zf <- df_z %>% filter(
@@ -168,3 +169,6 @@ for (metric in c("density", "edginess")) {
         height=10,
     )
 }
+
+report <- paste("saved plots to", save_dir)
+print(report)

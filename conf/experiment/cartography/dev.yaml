@@ -4,7 +4,7 @@ defaults:
 
 target_size: 100
 max_failed_expansions: 2
-n_pubs_max: 10
+n_pubs_per_exp_max: 10
 
 # for embed_documents; may be useful to reduce under memory constraints
 batch_size: 64

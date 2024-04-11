@@ -58,7 +58,7 @@ class Experiment:
         # TODO: make all of this logic more general via hydra and refactoring w recursive _target_ and _partial_ api, esp since its called in analyze.py too
         convergence_func = lambda atl: converged_pubs_convergence_func(
             atl,
-            1000, # size
+            10000, # size
             10000, # num_pubs_added
             kernel_size=16,
         )
@@ -66,7 +66,7 @@ class Experiment:
         self.tracer.expand_atlas(
             target_size = crt.target_size,
             max_failed_expansions = crt.max_failed_expansions,
-            n_pubs_max = crt.n_pubs_max,
+            n_pubs_per_exp_max = crt.n_pubs_per_exp_max,
             convergence_func = convergence_func,
             call_size = call_size,
             record_pubs_per_update=True,
