@@ -24,7 +24,10 @@ experiment:
     call_size: null
   plot:
     max_density: null
-    log_cpy: false
+    log_cpy: null
+    max_cpy_stds: 1
+    max_metric_stds: null
+    min_metric_stds: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

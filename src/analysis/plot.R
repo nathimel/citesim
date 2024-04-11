@@ -35,7 +35,28 @@ parser$add_argument(
   default=FALSE
 )
 
-# TODO: add optional args for the std filtering
+# Optional args for the std filtering
+parser$add_argument(
+  "--max_cpy_stds",
+  nargs=1,
+  type="double",
+  help="How many standard deviations above the mean to set the max cpy after z-scaling.",
+  default=1
+)
+parser$add_argument(
+  "--max_metric_stds",
+  nargs=1,
+  type="double",
+  help="How many standard deviations above the mean to set the max metric value after z-scaling.",
+  default=2
+)
+parser$add_argument(
+  "--min_metric_stds",
+  nargs=1,
+  type="double",
+  help="How many standard deviations below the mean to set the max metric value after z-scaling.",
+  default=-2
+)
 
 args <- parser$parse_args()
 
@@ -43,6 +64,9 @@ args <- parser$parse_args()
 df_fn <- args$data_fn
 save_dir <- args$save_dir
 max_density <- args$max_density
+max_cpy_stds <- args$max_cpy_stds
+min_metric_stds <- args$min_metric_stds
+max_metric_stds <- args$max_metric_stds
 log_cpy <- args$log_cpy
 
 # Load data
@@ -85,19 +109,18 @@ metric_vs_cpy <- function(metric) {
   # print(df_center)  
   
   # Filter to mean cpys
-  # TODO: sometimes the center will have more than mean!
-  # Maybe do +1 std?
-  # N.B.: physics, but no others, need +1 std for helpful visualization. This suggests we should outsource to config. 
+  # N.B.: sometimes the center will have more than mean!
+  # N.B.: physics, but no others, need +1 std for helpful visualization. This should be taken care of by args.
   df_z <- df_z %>%
     filter(
-      cpy_z <= 1
+      cpy_z <= max_cpy_stds
     )
 
   df_zf <- df_z %>% filter(
     (
-      metric_z >= -2
+      metric_z >= min_metric_stds
       & 
-      metric_z <= 2
+      metric_z <= max_metric_stds
     ),
   )
 

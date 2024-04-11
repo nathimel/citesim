@@ -1,2 +1,5 @@
 max_density: null # BOW and Word2Vec should be plotted with a cutoff
 log_cpy: null # whether to plot cpy on log scale
+max_cpy_stds: 0 # how many stds above mean cpy to visualize
+max_metric_stds: null # as above but for metrics
+min_metric_stds: null # but for min

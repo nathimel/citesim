@@ -110,7 +110,6 @@ def call_r_2d_histograms(
         save_dir = os.path.dirname(df_fn)
 
     # Process args
-    # cml_args = [f"--data_fn {df_fn}", f"--plot_dir {plot_dir}"]
     cml_args = [df_fn, save_dir]
     cml_kwargs = [f"--{key} {value}" for key, value in kwargs.items() if value is not None]
     all_cml_args = " ".join(cml_args + cml_kwargs)

@@ -50,8 +50,7 @@ def main(config: DictConfig):
     df_fn = os.path.join(os.getcwd(), "all_data.csv")
     plot.call_r_2d_histograms(
         df_fn,
-        max_density=config.experiment.plot.max_density,
-        log_cpy=config.experiment.plot.log_cpy,
+        **config.experiment.plot,
     )
 
 
