@@ -189,6 +189,8 @@ def atlas_to_measurements(
     )
     df["citations_per_year"] = citations_per_year
     df["is_center"] = is_center
+    # Annotate with ids, which can be helpful for copying atlases
+    df["identifier"] = converged_pub_ids
 
     df = df[~np.isinf(df["density"])] # drop infs which occur for BOW vectorizer
     # TODO what about other very high densities that result from close to 0?
