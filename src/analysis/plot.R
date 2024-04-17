@@ -276,6 +276,30 @@ ggsave(
     height=10,
 )
 
+# try visualizing distribution of cpy per density differently,
+# this is an alternative to the joy plot.
+
+joyalt <- (
+  ggplot(
+    df_zf,
+  )
+  + geom_density(
+    aes(
+      x=citations_per_year,
+      # color = density_bin,
+      fill = density_bin,
+    )
+  )
+  + scale_fill_viridis( discrete = TRUE)
+)
+save_fn = paste(save_dir, "/", "joyalt.png", sep="")
+ggsave(
+    save_fn,
+    plot=joyalt,
+    width=10,
+    height=10,
+)
+
 
 metric_vs_year <- function(metric) {
   return(
