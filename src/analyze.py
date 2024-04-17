@@ -28,6 +28,11 @@ def main(config: DictConfig):
         plot.fields_histogram(atl),
     )
 
+    util.save_plot(
+        "years_histogram.png",
+        plot.years_histogram(atl)
+    )
+
     df = plot.atlas_to_measurements(
         atl,
         vectorizer=exp.vectorizer,

@@ -92,6 +92,27 @@ def density_histogram(
     return cpy_hist  
 
 
+# TODO: refactor w above
+def years_histogram(
+    atl: Atlas,
+) -> pn.ggplot:
+    """Get a histogram of the years of publication."""
+
+    years = Counter([pub.publication_date.year for pub in atl.publications.values()])
+
+    return (
+        pn.ggplot(
+            data = pd.DataFrame(
+                data=[(year, count) for year,count in years.items()],
+                columns=["year", "count"],
+            ),
+            mapping=pn.aes(x="year", y="count"),
+        )
+        + pn.geom_col()
+    )
+
+ 
+
 # R backend
 # TODO: consider adding the identity of pubs in the data, so we can visualize where the center is in the distribution.
 def call_r_2d_histograms(
@@ -135,7 +156,7 @@ def atlas_to_measurements(
     fields_of_study = None,
     max_year: int = 2023, # consider 2022
 ) -> pd.DataFrame:
-    """Compute the density, edginess, and citations per year metrics for each publicaation in an atlas w.r.t. a vectorizer and convergence configurations, and return the results in a dataframe.
+    """Compute the density, edginess, and citations per year metrics for each publication in an atlas w.r.t. a vectorizer and convergence configurations, and return the results in a dataframe.
     
     Args:
         atl: the Atlas to measure
@@ -191,6 +212,8 @@ def atlas_to_measurements(
     df["is_center"] = is_center
     # Annotate with ids, which can be helpful for copying atlases
     df["identifier"] = converged_pub_ids
+    # Annotate with year of publication
+    df["year"] = [atl[id].publication_date.year for id in converged_pub_ids]
 
     df = df[~np.isinf(df["density"])] # drop infs which occur for BOW vectorizer
     # TODO what about other very high densities that result from close to 0?

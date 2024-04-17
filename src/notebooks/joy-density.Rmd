@@ -18,8 +18,10 @@ library(ggridges)
 
 
 ```{r load data}
-# df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=Word2Vec/center=Imeletal2022/all_data.csv")
+# df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=Imeletal2022/all_data.csv")
 df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=hafenLowredshiftLymanLimit2017/all_data.csv")
+# df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=Torres2013/all_data.csv")
+# df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=Ololube2012/all_data.csv")
 df
 ```
 
@@ -108,10 +110,11 @@ df_zf$density_bin <- cut(
   + geom_density()
   # + scale_x_log10()
   + scale_color_viridis(discrete = TRUE)
+  + ylab("frequency")
+  + xlim(0,10)
 )
 
 ```
-
 
 ```{r filledlines}
 (
@@ -123,7 +126,7 @@ df_zf$density_bin <- cut(
       fill = density_bin,
     )
   )
-  + geom_density(aes(y = after_stat(count)), alpha = 0.2)
+  + geom_density(aes(y = after_stat(density)), alpha = 0.2)
   # + scale_x_log10()
   + scale_color_viridis(discrete = TRUE)
   + scale_fill_viridis(discrete = TRUE)
@@ -176,6 +179,33 @@ df_zf$density_bin <- cut(
 )
 
 ```
+
+
+
+```{r violin}
+
+(
+  ggplot(
+    df_zf,
+    aes(
+      y = citations_per_year,
+      x = density_bin,
+      color = density_bin,
+      fill = density_bin,
+      alpha = 0.2,
+    )
+  )
+  + geom_violin()
+  
+  # + scale_y_log10()
+  # + xlim(8,10)
+  + scale_color_viridis(discrete = TRUE)
+  + scale_fill_viridis(discrete = TRUE)
+
+)
+
+```
+
 
 ```{r blob}
 

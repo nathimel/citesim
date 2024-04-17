@@ -1,10 +1,11 @@
 # Auxilliary R script to plot data, called by analysis.py. If plotnine ever matches ggplot's energy, this file won't need to exist.
 
-library(tidyverse)
-library(dplyr)
-library(viridis)
 library(argparse)
-
+library(dplyr)
+library(ggridges)
+library(tidyverse)
+library(viridis)
+library(DescTools)
 
 # create parser object
 parser <- ArgumentParser()
@@ -78,12 +79,16 @@ if (is.null(max_density)) {
   max_density <- Inf
 }
 
+
 df <- df %>% filter(
-  density <= max_density
+  density <= max_density,
+) %>% filter(
+  citations_per_year > 0, # We're going to compute log cpys, so need to avoid log0
 )
 
-# Plot metric vs. cpy
-metric_vs_cpy <- function(metric) {
+
+get_zscaled_filtered <- function(metric) {
+
   # Filter to 2 stds, for both vars
   metric_z <- paste(metric, "_z", sep="")
 
@@ -100,14 +105,6 @@ metric_vs_cpy <- function(metric) {
     logcpy_z = log10( cpy_z ),
   )
 
-  # Get the center to label
-  # N.B.: if the python script raised a warning, this dataframe will be empty and no point will be plotted.
-  df_center <- df_z %>% filter(
-    is_center == TRUE
-  )
-  # print("DF CENTER:")
-  # print(df_center)  
-  
   # Filter to mean cpys
   # N.B.: sometimes the center will have more than mean!
   # N.B.: physics, but no others, need +1 std for helpful visualization. This should be taken care of by args.
@@ -116,13 +113,29 @@ metric_vs_cpy <- function(metric) {
       cpy_z <= max_cpy_stds
     )
 
-  df_zf <- df_z %>% filter(
+  df_zscaled_filtered <- df_z %>% filter(
     (
       metric_z >= min_metric_stds
       & 
       metric_z <= max_metric_stds
     ),
   )
+
+  return(df_zscaled_filtered)
+}
+
+# Plot metric vs. cpy
+metric_vs_cpy <- function(metric) {
+
+  df_zf <- get_zscaled_filtered(metric)
+
+  # Get the center to label
+  # N.B.: if the python script raised a warning, this dataframe will be empty and no point will be plotted.
+  df_center <- df_zf %>% filter(
+    is_center == TRUE
+  )
+  print("DF CENTER:")
+  print(df_center)    
 
   y <- "citations_per_year"
   if (log_cpy) {
@@ -183,11 +196,115 @@ metric_vs_cpy <- function(metric) {
   return(plot)
 }
 
+# Ridges
+df_zf <- get_zscaled_filtered("density")
+df_zf$density_bin <- cut(
+  df_zf$density, 
+  breaks = seq(
+    min(df_zf$density), 
+    max(df_zf$density), 
+    length.out = 21
+  )
+)
+
+joyplot = (
+  ggplot(
+    df_zf,
+    aes(
+      x = citations_per_year,
+      y = density_bin,
+      color = density_bin,
+      fill = density_bin,
+      alpha = 0.2,
+    )
+  )
+  + geom_density_ridges()
+  # + xlim(8,10)
+  + scale_color_viridis(discrete = TRUE)
+  + scale_fill_viridis(discrete = TRUE)
+)
+save_fn = paste(save_dir, "/", "density_joyplot.png", sep="")
+ggsave(
+    save_fn,
+    plot=joyplot,
+    width=10,
+    height=10,
+)
+
+# Compute entropy for each bin
+value_counts <-  count(df_zf, density_bin)
+density_bin_counts <- value_counts$n
+density_levels <- value_counts$density_bin
+
+cpy_ents <- c()
+bin_starts <- c()
+for (val in density_levels) {
+  # need to do some regexing on the density bin name string
+  text <- val
+  pattern <- "\\(([-+]?[0-9]*\\.?[0-9]+),"
+  numbers <- str_extract_all(text, pattern)
+  start <- as.double(lapply(numbers[[1]], function(x) gsub("[(,]", "", x)))
+
+  # now filter and compute entropy
+  df_val <- df_zf %>% filter(density_bin == val)
+  cpy_values <- unlist(c(df_val["citations_per_year"]))
+  h <- Entropy(cpy_values)
+  cpy_ents <- append(cpy_ents, h)
+  bin_starts <- append(bin_starts, start)
+}
+
+df_ent <- tibble(cpy_ents, bin_starts, density_bin_counts)
+cpy_ent <- (
+  ggplot(
+    df_ent,
+    aes(
+      x=bin_starts,      
+      y=density_bin_counts,
+      fill=cpy_ents,
+    )
+  )
+  # + geom_point(size=10)
+  + geom_col()
+  + scale_fill_viridis()
+  + labs(fill="citation entropy,\nH(CPY | density_bin)\n")
+)
+save_fn = paste(save_dir, "/", "citation_entropy_vs_density_bins.png", sep="")
+ggsave(
+    save_fn,
+    plot=cpy_ent,
+    width=10,
+    height=10,
+)
+
+
+metric_vs_year <- function(metric) {
+  return(
+    ggplot(
+        df_zf,
+        aes(
+          x=year,
+          y=.data[[metric]],
+        )
+      )
+      + geom_point(alpha=0.2)
+      + geom_smooth(color="orange", method="lm")
+  )
+}
+
 for (metric in c("density", "edginess")) {
+  # todo: refactor these into a func and call twice
     save_fn <- paste(save_dir, "/", metric, ".png", sep="")
     ggsave(
         save_fn,
         plot=metric_vs_cpy(metric),
+        width=10,
+        height=10,
+    )
+
+    save_fn <- paste(save_dir, "/", "year_vs_", metric, ".png", sep="")
+      ggsave(
+        save_fn,
+        plot=metric_vs_year(metric),
         width=10,
         height=10,
     )
