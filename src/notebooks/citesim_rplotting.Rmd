@@ -17,7 +17,7 @@ library(latex2exp)
 
 
 ```{r load data}
-df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=Word2Vec/center=hafenLowredshiftLymanLimit2017/all_data.csv")
+df = read_csv("/Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=hafenLowredshiftLymanLimit2017/all_data.csv")
 df
 ```
 

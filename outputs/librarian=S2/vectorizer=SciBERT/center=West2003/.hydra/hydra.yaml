@@ -106,11 +106,14 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - experiment.plot.max_cpy_stds=1
+    - experiment.cartography.target_size=30000
+    - experiment.cartography.n_pubs_per_exp_max=500
+    - experiment.atlas.center=West2003
+    - experiment.cartography.required_pub_conditions.fields_of_study=[Economics]
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.plot.max_cpy_stds=1
+    override_dirname: experiment.cartography.n_pubs_per_exp_max=500,experiment.cartography.required_pub_conditions.fields_of_study=[Economics],experiment.cartography.target_size=30000
     id: ???
     num: ???
     config_name: config
@@ -139,7 +142,7 @@ hydra:
     - path: ''
       schema: structured
       provider: schema
-    output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=hafenLowredshiftLymanLimit2017
+    output_dir: /Users/nathanielimel/uci/projects/citesim/outputs/librarian=S2/vectorizer=SciBERT/center=West2003
     choices:
       experiment: dev
       experiment/plot: dev
