@@ -196,6 +196,46 @@ metric_vs_cpy <- function(metric) {
   return(plot)
 }
 
+metric_cpy_basic_regression <- function(metric) {
+
+  df_zf <- get_zscaled_filtered(metric)
+  y <- "citations_per_year"
+  if (log_cpy) {
+    y <- "logcpy"
+  }  
+
+  plot = (
+    ggplot(
+      df_zf,
+      mapping=aes(
+        # x=density_z, 
+        x=.data[[metric]], # NOTE that we filter by z-scale, but can still plot the orig values.
+        # y=citations_per_year
+        y=.data[[y]],
+      )
+    )
+    + xlab(str_to_title(metric))
+    # + ylab("Citations per year")
+    + ylab("Citations per year")
+
+    # Local linear regression
+    + geom_smooth(color="orange", size=3)
+
+    + geom_point(
+      alpha=0.1,
+      # color="white",
+      size=1,
+    )
+    
+    + ylim(0, NA)
+    + theme(
+      # axis_title_y=element_blank(),
+      axis.title=element_text(size=18),
+    )
+  )
+  return(plot)
+}
+
 # Ridges
 df_zf <- get_zscaled_filtered("density")
 df_zf$density_bin <- cut(
