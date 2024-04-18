@@ -83,7 +83,7 @@ if (is.null(max_density)) {
 df <- df %>% filter(
   density <= max_density,
 ) %>% filter(
-  citations_per_year > 0, # We're going to compute log cpys, so need to avoid log0
+  citations_per_year > 0, # We're going to compute log cpys, so need to avoid log0,
 )
 
 
@@ -232,6 +232,34 @@ ggsave(
 )
 
 # Compute entropy for each bin
+entropy_estimator <- function(observations) {
+  if (length(observations) == 0) {
+    return(NaN)
+  }
+  
+  # Calculate bin width for each dimension
+  bin_width <- 20 / 21
+
+  # Compute histogram
+  # Compute histogram
+  # we could use seq(min_value, max_value, length.out = num_bins + 1),
+  # but since we essentially filter to <=10 cpys anyway, just estimate this range evenly
+  hist <- hist(observations, breaks = 0:20, plot = FALSE)
+
+  # Compute probabilities for each bin
+  bin_probabilities <- hist$counts / length(observations)
+
+  # Calculate entropy for this dimension
+  entropy_estimate <- -sum(bin_probabilities * log(bin_probabilities + 1e-16) / bin_width)  # Add small value to avoid log(0)
+
+  return(entropy_estimate)
+}
+
+# Now we'll filter to less than 20 cpys; the vast majority of data has less than 10 cpys
+df_zf <- df_zf %>% filter(
+  citations_per_year <= 20,
+)
+
 value_counts <-  count(df_zf, density_bin)
 density_bin_counts <- value_counts$n
 density_levels <- value_counts$density_bin
@@ -248,7 +276,7 @@ for (val in density_levels) {
   # now filter and compute entropy
   df_val <- df_zf %>% filter(density_bin == val)
   cpy_values <- unlist(c(df_val["citations_per_year"]))
-  h <- Entropy(cpy_values)
+  h <- entropy_estimator(cpy_values)
   cpy_ents <- append(cpy_ents, h)
   bin_starts <- append(bin_starts, start)
 }
@@ -288,7 +316,8 @@ joyalt <- (
       x=citations_per_year,
       # color = density_bin,
       fill = density_bin,
-    )
+    ),
+    alpha=0.75,    
   )
   + scale_fill_viridis( discrete = TRUE)
 )
@@ -296,6 +325,35 @@ save_fn = paste(save_dir, "/", "joyalt.png", sep="")
 ggsave(
     save_fn,
     plot=joyalt,
+    width=10,
+    height=10,
+)
+
+h_regression <- (
+    ggplot(
+        df_ent, 
+        aes(
+            x=bin_starts,
+            y=cpy_ents,
+        )        
+    )
+    + geom_point(
+        aes(
+            size=density_bin_counts,
+            alpha=density_bin_counts,
+        )
+    )
+    + geom_smooth(method="lm", color="orange")
+    + xlab("density bin")
+    + ylab("citation entropy, H(CPY | density_bin)\n")
+    + labs(size="count")
+    + labs(alpha="count")
+    
+)
+save_fn = paste(save_dir, "/", "entropy_regression.png", sep="")
+ggsave(
+    save_fn,
+    plot=h_regression,
     width=10,
     height=10,
 )
