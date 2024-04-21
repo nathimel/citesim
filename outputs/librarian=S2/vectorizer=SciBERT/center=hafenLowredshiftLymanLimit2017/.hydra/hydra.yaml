@@ -105,12 +105,11 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task:
-    - experiment.plot.max_cpy_stds=1
+    task: []
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.plot.max_cpy_stds=1
+    override_dirname: ''
     id: ???
     num: ???
     config_name: config

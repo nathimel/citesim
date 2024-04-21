@@ -184,12 +184,16 @@ def atlas_to_measurements(
     crt = Cartographer(
         vectorizer=vectorizer,
     )
+    topo_metrics = ["density", "edginess"]
     measurements = crt.measure_topography(
         atl, 
         ids=converged_pub_ids,
-        metrics=["density", "edginess"], 
+        metrics=topo_metrics,
         kernel_size=kernel_size,
     )
+
+    # Count references.
+    references = [len(atl[id].references) for id in converged_pub_ids]
 
     # Get citations
     citations_per_year = [ 
@@ -206,8 +210,9 @@ def atlas_to_measurements(
 
     df = pd.DataFrame(
         measurements,
-        columns=["density", "edginess"],
+        columns=topo_metrics,
     )
+    df["references"] = references
     df["citations_per_year"] = citations_per_year
     df["is_center"] = is_center
     # Annotate with ids, which can be helpful for copying atlases

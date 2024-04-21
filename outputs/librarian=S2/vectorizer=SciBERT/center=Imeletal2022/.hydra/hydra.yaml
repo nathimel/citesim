@@ -106,16 +106,14 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
-    - experiment.cartography.target_size=10000
+    - experiment.cartography.target_size=30000
     - experiment.cartography.n_pubs_per_exp_max=500
-    - experiment.plot.max_cpy_stds=0
     - experiment.atlas.center=Imeletal2022
-    - experiment.plot.max_metric_stds=1
-    - experiment.plot.min_metric_stds=-1
+    - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
   job:
     name: analyze
     chdir: true
-    override_dirname: experiment.cartography.n_pubs_per_exp_max=500,experiment.cartography.target_size=10000,experiment.plot.max_cpy_stds=0,experiment.plot.max_metric_stds=1,experiment.plot.min_metric_stds=-1
+    override_dirname: experiment.cartography.n_pubs_per_exp_max=500,experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics],experiment.cartography.target_size=30000
     id: ???
     num: ???
     config_name: config

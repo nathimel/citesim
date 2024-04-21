@@ -17,7 +17,7 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Linguistics
-    target_size: 10000
+    target_size: 30000
     max_failed_expansions: 2
     n_pubs_per_exp_max: 500
     batch_size: 64
@@ -26,8 +26,8 @@ experiment:
     max_density: null
     log_cpy: null
     max_cpy_stds: 0
-    max_metric_stds: 1
-    min_metric_stds: -1
+    max_metric_stds: null
+    min_metric_stds: null
 seed: 42
 filepaths:
   atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib

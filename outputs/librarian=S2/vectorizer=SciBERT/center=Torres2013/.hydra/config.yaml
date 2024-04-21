@@ -17,9 +17,9 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Medicine
-    target_size: 30000
+    target_size: 100
     max_failed_expansions: 2
-    n_pubs_per_exp_max: 500
+    n_pubs_per_exp_max: 10
     batch_size: 64
     call_size: null
   plot:

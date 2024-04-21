@@ -25,7 +25,7 @@ experiment:
   plot:
     max_density: null
     log_cpy: null
-    max_cpy_stds: 1
+    max_cpy_stds: 0
     max_metric_stds: null
     min_metric_stds: null
 seed: 42

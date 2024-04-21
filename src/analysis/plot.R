@@ -96,6 +96,7 @@ get_zscaled_filtered <- function(metric) {
     df,
     metric_z = scale(.data[[metric]]),
     cpy_z = scale(citations_per_year),
+    references_z = scale(references),
   )
   
   # Add log transform
@@ -119,6 +120,8 @@ get_zscaled_filtered <- function(metric) {
       & 
       metric_z <= max_metric_stds
     ),
+  ) %>% filter(
+      references_z <= 3, # might need to outsource to args and config
   )
 
   return(df_zscaled_filtered)
@@ -396,6 +399,25 @@ ggsave(
     plot=h_regression,
     width=10,
     height=10,
+)
+
+# Regression for density and references
+refs_regression <- (
+  ggplot(
+    df_zf,
+    aes(x=density, y=references)
+  )
+  + geom_point(
+    alpha=0.2,
+  )
+  + geom_smooth(color="orange", method="lm")
+)
+save_fn = paste(save_dir, "/", "references_regression.png", sep="")
+ggsave(
+  save_fn,
+  plot=refs_regression,
+  width=10,
+  height=10,
 )
 
 
