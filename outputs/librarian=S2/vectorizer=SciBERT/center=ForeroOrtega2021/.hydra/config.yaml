@@ -17,7 +17,7 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Geology
-    target_size: 10000
+    target_size: 30000
     max_failed_expansions: 2
     n_pubs_per_exp_max: 500
     batch_size: 64
