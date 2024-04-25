@@ -1,0 +1,96 @@
+---
+title: "references"
+author: "Nathaniel Imel"
+date: "2024-04-23"
+output: html_document
+---
+  
+  
+```{r setup}
+library(tidyverse)
+library(lme4)
+library(modelr)
+library(viridis)
+library(ggrepel)
+library(latex2exp)
+library(ggridges)
+```
+
+```{r load}
+df_all <- read_csv("../../analysis_data/all_data.csv")
+head(df_all)
+```
+
+```{r plot}
+
+df <- df_all %>% mutate(
+  references_z = scale(references),
+  density_z = scale(density),
+) %>% filter(
+  references_z < 2,
+  density_z < 2
+)
+
+(
+    ggplot(
+        df,
+        # df,
+        aes(
+            x=density,
+            y=references,
+            color=fields_of_study_0,
+        )
+    )
+    # + scale_y_log10()
+    + geom_point(alpha=0.01)
+    + geom_smooth()
+    + facet_wrap("fields_of_study_0")
+    + xlab("Prior density of neighborhood")
+    + ylab("Number of references")
+    + theme_minimal()
+    # TODO: annotate each line with R^2, p-values
+    # TODO: normalize each by the average number of references per field
+)
+
+```
+
+```{r load2}
+
+df_var <- read_csv("/Users/nathanielimel/uci/projects/citesim/src/notebooks/all_cpy_variance_data.csv")
+head(df_var)
+```
+
+
+```{r plot2}
+
+df_var <- df_var %>% mutate(
+  density_bin_z = scale(density_bin),
+) %>% filter(
+  density_bin_z < 2
+)
+
+
+(
+        ggplot(
+            df_var, 
+            aes(
+                x=density_bin,
+                y=log_cpy_variance,
+                color=field,
+                # shape=field,
+            )
+        )
+        # + facet_wrap("field")
+        + geom_point(
+            aes(
+                # size=freq,
+                alpha=freq,
+            )
+        )
+        # + geom_smooth()
+        + ylab("Variance in citations per year")
+        + xlab("Prior density of neighborhood")
+        + theme_classic()
+)
+
+```
