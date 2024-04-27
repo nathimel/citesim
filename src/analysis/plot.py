@@ -154,7 +154,8 @@ def atlas_to_measurements(
     num_pubs_added: int = 1000, 
     kernel_size =  16, # TODO: find a principled way of selecting this value.
     fields_of_study = None,
-    max_year: int = 2023, # consider 2022
+    max_year: int = 2020, # consider 2020, since that is when exp growth falls
+    min_year: int = 2000,
 ) -> pd.DataFrame:
     """Compute the density, edginess, and citations per year metrics for each publication in an atlas w.r.t. a vectorizer and convergence configurations, and return the results in a dataframe.
     
@@ -195,9 +196,11 @@ def atlas_to_measurements(
     # Count references.
     references = [len(atl[id].references) for id in converged_pub_ids]
 
+    valid_year = lambda year: year < max_year and year > min_year
+
     # Get citations
     citations_per_year = [ 
-        atl[id].citation_count / (max_year - atl[id].publication_date.year) if (atl[id].publication_date.year < max_year and atl[id].citation_count is not None) else 0.
+        atl[id].citation_count / (max_year - atl[id].publication_date.year) if (valid_year(atl[id].publication_date.year) and atl[id].citation_count is not None) else np.nan # prev set else to 0, but this is less ambiguous
         for id in converged_pub_ids
     ]
 

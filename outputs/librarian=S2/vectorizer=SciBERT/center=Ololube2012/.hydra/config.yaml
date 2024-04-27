@@ -17,9 +17,9 @@ experiment:
       - fields_of_study
       fields_of_study:
       - Education
-    target_size: 100
+    target_size: 30000
     max_failed_expansions: 2
-    n_pubs_per_exp_max: 10
+    n_pubs_per_exp_max: 500
     batch_size: 64
     call_size: null
   plot:
