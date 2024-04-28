@@ -41,7 +41,8 @@ summary(model)
                 x=density_med_bin,
                 # y=log_cpy_med_bin,
                 # y=log_cpy_var,
-                y=cpy_var,
+                # y=cpy_var,
+                y=cpy_med_bin,
                 # color=field,
                 # shape="field",
             )

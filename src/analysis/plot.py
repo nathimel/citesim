@@ -197,6 +197,7 @@ def atlas_to_measurements(
     references = [len(atl[id].references) for id in converged_pub_ids]
 
     valid_year = lambda year: year < max_year and year > min_year
+    # valid_year = lambda year: year == 2010 # robustness check that trends hold for specific years
 
     # Get citations
     citations_per_year = [ 
