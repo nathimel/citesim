@@ -1,0 +1,3 @@
+- experiment.vectorizer.name=GPT2
+- experiment.atlas.center=Torres2013
+- experiment.cartography.required_pub_conditions.fields_of_study=[Medicine]
