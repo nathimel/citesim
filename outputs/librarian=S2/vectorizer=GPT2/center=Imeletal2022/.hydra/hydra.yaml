@@ -110,7 +110,7 @@ hydra:
     - experiment.atlas.center=Imeletal2022
     - experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
   job:
-    name: setup
+    name: analyze
     chdir: true
     override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Linguistics]
     id: ???

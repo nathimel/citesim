@@ -151,6 +151,7 @@ def call_r_2d_histograms(
 def atlas_to_measurements(
     atl: Atlas,
     vectorizer: Vectorizer,
+    converged_pub_ids: list[str] = None,
     num_pubs_added: int = 1000, 
     kernel_size =  16, # TODO: find a principled way of selecting this value.
     fields_of_study = None,
@@ -164,18 +165,19 @@ def atlas_to_measurements(
 
         vectorizer: the Vectorizer to use to compute density and edginess
 
-        con_d: a reverse index. This represents a convergence degree, in the sense that it is the number of updates before the last udpate to require that a publication's neighborhood has not changed identity of composition.
+        converged_pub_ids: the identifiers of publications to consider for analysis. By default is `None`, and will be inferred on the bases of the next two parameters.
 
         num_pubs_added: propagated to `search_converged_ids`
 
         kernel_size: propagated to `search_converged_ids`
     """
 
-    converged_pub_ids = search_converged_ids(
-        atl, 
-        num_pubs_added=num_pubs_added, 
-        kernel_size=kernel_size,
-    )
+    if converged_pub_ids is None:
+        converged_pub_ids = search_converged_ids(
+            atl, 
+            num_pubs_added=num_pubs_added, 
+            kernel_size=kernel_size,
+        )
 
     # Optionally filter only to `field_of_study` publications
     if fields_of_study is not None:
@@ -205,6 +207,11 @@ def atlas_to_measurements(
         for id in converged_pub_ids
     ]
 
+    # Get year
+    years = [
+        atl[id].publication_date.year for id in converged_pub_ids
+    ]
+
     # Annotate the center (this feels inefficient, but oh well)
     is_center = [identifier == atl.center for identifier in converged_pub_ids]
 
@@ -222,7 +229,7 @@ def atlas_to_measurements(
     # Annotate with ids, which can be helpful for copying atlases
     df["identifier"] = converged_pub_ids
     # Annotate with year of publication
-    df["year"] = [atl[id].publication_date.year for id in converged_pub_ids]
+    df["year"] = years
 
     df = df[~np.isinf(df["density"])] # drop infs which occur for BOW vectorizer
     # TODO what about other very high densities that result from close to 0?

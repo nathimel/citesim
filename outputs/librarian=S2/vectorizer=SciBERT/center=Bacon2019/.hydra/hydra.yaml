@@ -106,12 +106,14 @@ hydra:
     hydra:
     - hydra.mode=RUN
     task:
+    - experiment.cartography.target_size=30000
+    - experiment.cartography.n_pubs_per_exp_max=500
     - experiment.atlas.center=Bacon2019
     - experiment.cartography.required_pub_conditions.fields_of_study=[Philosophy]
   job:
-    name: analyze
+    name: build_atlas
     chdir: true
-    override_dirname: experiment.cartography.required_pub_conditions.fields_of_study=[Philosophy]
+    override_dirname: experiment.cartography.n_pubs_per_exp_max=500,experiment.cartography.required_pub_conditions.fields_of_study=[Philosophy],experiment.cartography.target_size=30000
     id: ???
     num: ???
     config_name: config

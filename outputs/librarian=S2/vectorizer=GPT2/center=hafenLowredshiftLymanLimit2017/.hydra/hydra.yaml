@@ -108,7 +108,7 @@ hydra:
     task:
     - experiment.vectorizer.name=GPT2
   job:
-    name: setup
+    name: analyze
     chdir: true
     override_dirname: ''
     id: ???

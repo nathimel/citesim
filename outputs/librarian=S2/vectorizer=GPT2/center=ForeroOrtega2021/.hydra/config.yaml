@@ -1,0 +1,38 @@
+experiment:
+  librarian:
+    name: S2
+    kwargs:
+      api_key_fn: null
+  vectorizer:
+    name: GPT2
+    kwargs:
+      device: mps
+  atlas:
+    center: ForeroOrtega2021
+  cartography:
+    required_pub_conditions:
+      attributes:
+      - abstract
+      - publication_date
+      - fields_of_study
+      fields_of_study:
+      - Geology
+    target_size: 100
+    max_failed_expansions: 2
+    n_pubs_per_exp_max: 10
+    batch_size: 64
+    call_size: null
+  plot:
+    max_density: null
+    log_cpy: null
+    max_cpy_stds: 0
+    max_metric_stds: null
+    min_metric_stds: null
+seed: 42
+filepaths:
+  atlas_center_bibtex: data/bib/${experiment.atlas.center}.bib
+  vectorizer_subdir: librarian=${experiment.librarian.name}/vectorizer=${experiment.vectorizer.name}
+  experiment_subdir: ${filepaths.vectorizer_subdir}/center=${experiment.atlas.center}
+  leaf_subdir: ${filepaths.experiment_subdir}
+  hydra_run_root: outputs
+  hydra_sweep_root: multirun
