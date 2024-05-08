@@ -1,6 +1,7 @@
 # Large files
-# pickle binaries, i.e. atlases and projections
+# pickle binaries, i.e. atlases, projections, models
 **/*.pkl
+**/*.model
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/

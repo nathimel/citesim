@@ -162,7 +162,7 @@ df_plot <- rbind(
     aes(
       x=bic_gain,
       y=term,
-      # fill=vectorizer,
+      fill=vectorizer,
     )
   )
   + geom_bar( stat = "identity", position = "dodge")
@@ -263,21 +263,25 @@ getrefs <- function(y, vectorizer_name, print_summary=TRUE) {
     density_bin_z = scale(density_bin),
     year_med_z = scale(year_med),
     ref_med_z = scale(ref_med),
+    freq_z = scale(freq),
   ) %>% filter(
     y_z < 3,
     y_z > -3,
     density_bin_z < 3,
     density_bin_z > -3,
     ref_med_z < 3,
-    ref_med_z > -3
+    ref_med_z > -3,
+    freq_z < 3,
+    freq_z > -3
   )
   
   # Model 5: 
   label_5 <- paste(
     # "y_z ~ year_med_z + density_bin_z + (1 | field)"
-    "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 | field)"
+    # "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 | field)"
     # "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z + ref_med_z | field)"
-    # "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z | field)"
+    "y_z ~ ref_med_z + year_med_z + freq_z + density_bin_z + (1 + density_bin_z | field)"
+    # "y_z ~ ref_med_z + year_med_z + freq_z + density_bin_z + (1 | field)"    
   )
   fm_5 <- as.formula(label_5)
   model_5 <- lmer(
@@ -290,13 +294,13 @@ getrefs <- function(y, vectorizer_name, print_summary=TRUE) {
     print(summary(model_5))    
   }
   
-  model_ref_rho <- lmer(
-    ref_med_z ~ density_bin_z + (1 + density_bin_z | field), 
-    data=df_vectorizer,
-    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
-  )
-  
-  print(summary(model_ref_rho))
+  # model_ref_rho <- lmer(
+  #   ref_med_z ~ density_bin_z + (1 + density_bin_z | field), 
+  #   data=df_vectorizer,
+  #   control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+  # )
+  # 
+  # print(summary(model_ref_rho))
 
   return(model_5)
   
@@ -307,12 +311,39 @@ getrefs("log_cpy_var", "SciBERT", FALSE)
 
 ```
 
+```{r summaries}
+
+# sigs_dfs <- tibble()
+# 
+# for (vec in unique(df_all$vectorizer)) {
+#   sigs_df <- tidy(getrefs(y, vec, FALSE)) %>% filter(
+#     effect == "fixed",
+#     term != "(Intercept)"
+#   ) %>% select(
+#     term,
+#     estimate,
+#     p.value,
+#   ) %>% mutate(
+#     model = vec
+#   )
+#   sigs_dfs <- rbind(sigs_dfs, sigs_df)
+# 
+# }
+# 
+# sigs_dfs <- sigs_dfs %>% mutate(
+#   significance = `p.value` < 0.05
+# )
+# sigs_dfs
+```
+
+
 
 ```{r forestplots}
 
 for (y in c("cpy_med", "log_cpy_var")) {
   print(
-    plot_summs(
+    
+   plot_summs(
       getrefs(y, "SciBERT",),
       getrefs(y, "SBERT"),
       getrefs(y, "GPT2"),
@@ -321,6 +352,7 @@ for (y in c("cpy_med", "log_cpy_var")) {
       model.names = c("SciBERT", "SBERT", "GPT2", "Word2Vec", "BOW"),
       # model.names = c("SciBERT", "SBERT", "GPT2"),
       colors = "Rainbow",
+      point.shape = FALSE,
       robust=TRUE, 
       inner_ci_level = .9
       # plot.distributions = TRUE
@@ -329,7 +361,9 @@ for (y in c("cpy_med", "log_cpy_var")) {
     # + scale_color_manual( values = c("blue", "red"))
     + theme(
       axis.text.x = element_text(size=20)
-    )  
+    )
+    # Add shapes for significance
+
   )  
   
 }
@@ -356,19 +390,123 @@ df_grouped <- df_all %>%
          ref_med_z > -3)
 
 # head(df_grouped)
+for (vec in unique(df_grouped$vectorizer)) {
+  df_vec <- df_grouped %>% filter(
+    vectorizer == vec
+  )
+  plot <- (
+    ggplot(
+      df_vec,
+      aes(
+        # x=density_bin_z,
+        # y=ref_med_z,
+        x=density_bin,
+        y=ref_med,
+        # color=field,
+      )
+    )
+    + geom_smooth(
+      method="lm",
+      linewidth=3,
+      color="black",
+    )
+    + geom_point(
+      aes(
+        color=field,
+      ),
+      size=0.5,
+      alpha=0.2,
+    )
+    + geom_smooth(
+      aes(
+        color=field,      
+      ),
+      # method="lm",
+      linewidth=1,
+    )
+    # + facet_grid("~ vectorizer")
+    # + facet_wrap("vectorizer")
+    + theme_classic()
+    + ggtitle(vec)
+    + theme(
+      axis.text = element_text(size=20)
+    )    
+  )
+  print(plot)
+    
+}
 
-(
+
+# ggsave(
+#   "refs_by_vectorizers.png",
+#   width=12,
+#   height=3,
+# )
+
+```
+
+```{r refreg}
+
+getrefs("cpy_med", "SciBERT", TRUE)
+getrefs("cpy_med", "SBERT", TRUE)
+getrefs("cpy_med", "GPT2", TRUE)
+getrefs("cpy_med", "Word2Vec", TRUE)
+getrefs("cpy_med", "BOW", TRUE)
+
+```
+
+
+```{r time}
+
+
+# Create a new df grouped by vectorizer and field (should have done this above, refactor)
+
+df_grouped <- df_all %>%
+  group_by(field, vectorizer) %>%
+  mutate_at(vars(cpy_med, density_bin, year_med, ref_med),
+            list(z = ~scale(.))) %>%
+  filter(cpy_med_z < 3,
+         cpy_med_z > -3,
+         density_bin_z < 3,
+         density_bin_z > -3,
+         ref_med_z < 3,
+         ref_med_z > -3,
+         # year_med_z < 3,
+         # year_med_z > -3
+        )
+
+# head(df_grouped)
+
+# drop gpt for now
+
+for (vec in unique(df_grouped$vectorizer)) {
+  df_vec <- df_grouped %>% filter(
+    vectorizer == vec
+  )
+  
+  plot <- (
   ggplot(
-    df_grouped,
+    df_vec,
     aes(
-      x=density_bin_z,
-      y=ref_med_z,
+      # x=year_med_z,
+      # y=density_bin_z,
+      # What happens if we don't consider the z-score? Then GPT screws stuff up
+      x=year_med,
+      y=density_bin,
       # color=field,
     )
   )
   + geom_smooth(
     method="lm",
-    linewidth=5,
+    linewidth=3,
+    color="black",
+  )
+  + geom_point(
+    aes(
+      color=field,
+    ),
+    size=0.5,
+    alpha=0.2,
   )
   + geom_smooth(
     aes(
@@ -377,15 +515,90 @@ df_grouped <- df_all %>%
     # method="lm",
     linewidth=1,
   )
-  # + facet_grid("vectorizer ~ .")
-  + facet_wrap("vectorizer")
+  # + facet_grid("~ vectorizer")
+  # + facet_wrap("vectorizer")
+  + theme_classic()
+  + ggtitle(vec)
+  + theme(
+    axis.text = element_text(size=20)
+  )
 )
+  print(plot)
+}
 
-getrefs("cpy_med", "SciBERT", FALSE)
-getrefs("cpy_med", "SBERT", FALSE)
-getrefs("cpy_med", "GPT2", FALSE)
-getrefs("cpy_med", "Word2Vec", FALSE)
-getrefs("cpy_med", "BOW", FALSE)
+
+# 
+# ggsave(
+#   "rho_vs_year_by_vectorizers.png",
+#   width=12,
+#   height=3,
+# )
+
 
 ```
+
+
+```{r bicrivisited}
+
+
+
+
+# NOTE: need to loop over y var too!
+for (y in c("cpy_med", "log_cpy_var")){
+for (vec in unique(df_grouped$vectorizer)) {
+
+  df_vec <- df_all %>% filter(
+    vectorizer == vec
+  ) %>% mutate(
+    # z-scale
+    y_z = scale(.data[[y]]),
+    density_bin_z = scale(density_bin),
+    year_med_z = scale(year_med),
+    ref_med_z = scale(ref_med),
+    freq_z = scale(freq),
+  ) %>% filter(
+    y_z < 3,
+    y_z > -3,
+    density_bin_z < 3,
+    density_bin_z > -3,
+    ref_med_z < 3,
+    ref_med_z > -3
+  )
+  
+  main_model <- lmer(
+    y_z ~ ref_med_z + year_med_z + freq_z + density_bin_z + (1  | field),
+    data=df_vec, 
+    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+  )  
+  
+  ablated_model <- lmer(
+    y_z ~ ref_med_z + year_med_z + freq_z + (1 | field),
+    data=df_vec,
+    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+  )
+  
+  simpler_model <- lmer(
+    y_z ~ density_bin_z + (1 | field),
+    data=df_vec,
+    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))    
+  )
+
+  print("--------------------")
+  print(paste(vec, "x", y))
+  print("--------------------")
+  # print(anova(
+  #   main_model,
+  #   ablated_model
+  # ))
+  # print("\n")
+  
+  # print(summary(simpler_model))
+  print(summary(main_model))
+  
+}
+}
+
+
+```
+
 
