@@ -241,3 +241,287 @@ def atlas_to_measurements(
     return df
 
 
+import scipy
+import matplotlib.pyplot as plt
+import warnings
+import matplotlib.gridspec as gridspec
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
+
+
+def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
+    """Main trend doubleplot with binned density (z-scaled) on x axis and median cpy and log cpy variance on y axis.
+    
+    Args:
+        df_plot: dataframe containing columns ['density_bin_z', 'cpy_med', 'log_cpy_var', 'field']. This should only contain measurements filtered to a specific vectorizer, and already filtered between reasonable z-scores (e.g., -3 and 3).
+
+    Returns:
+        a pair (fig, ax) corresponding to matplotlib Figure and Axes for the plot.
+    
+    """
+
+    rows = ["median", "variance"]
+    n_rows = 2
+
+    facecolor = np.array([ 235, 235, 235 ]) / 256.
+    fig = plt.figure( figsize=(12, 5*n_rows), facecolor=facecolor )
+
+    gs = gridspec.GridSpec( n_rows, 1 )
+    gs.update( hspace=0.05, wspace=0.001 )
+
+
+    x_variable = "density_bin_z"
+    y_variable_maps = {
+        "median": "cpy_med",
+        "variance": "log_cpy_var",
+    }
+
+    # For each trend
+    for row_idx, row in enumerate(rows):
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ax = plt.subplot( gs[row_idx,0],  )
+
+        y_variable = y_variable_maps[row]
+        x_observations = df_plot[x_variable]
+        y_observations = df_plot[y_variable]
+
+        # N.B.: global scatter, median, percentiles not really well formed across fields, since citation rates are field specific.
+
+        # GLobal
+
+        bin_edges = np.linspace(
+            x_observations.min(),
+            x_observations.max(),
+            10,
+        )
+
+        xs = bin_edges[:-1] + 0.33 * ( bin_edges[1] - bin_edges[0] )
+
+        # Global median number of citations (baseline)
+        global_median = np.nanpercentile( y_observations, 50. )
+        ax.axhline(
+            global_median,
+            color = '0.1',
+            linestyle = '--',
+            linewidth = 5,
+            zorder = -100,
+        )
+        ax.annotate(
+            text = 'global\n\nmedian',
+            xy = (bin_edges[-1], global_median),
+            xycoords = 'data',
+            xytext = (0, 0),
+            textcoords = 'offset points',
+            va = 'center',
+            ha = 'right',
+            fontsize = 14,
+        )    
+
+
+        #######################################
+        # Fields
+        #######################################      
+
+        fields = df_plot.field.unique()
+        cmap = plt.cm.jet  # define the colormap
+
+        for field in fields:
+
+            df_field = df_plot[df_plot["field"] == field]
+
+            x_observations_field = df_field[x_variable]
+            y_observations_field = df_field[y_variable]
+
+            bin_edges = np.linspace(
+                x_observations_field.min(),
+                x_observations_field.max(),
+                10,
+            )
+
+            xs = bin_edges[:-1] + 0.33 * ( bin_edges[1] - bin_edges[0] )
+
+            # Binned median
+            median, bin_edges, _ = scipy.stats.binned_statistic( x_observations_field, y_observations_field, 'median', bins=bin_edges )
+            upper_fn = lambda y: np.nanpercentile( y, 68 )
+            upper, _, _ = scipy.stats.binned_statistic( x_observations_field, y_observations_field, upper_fn, bins=bin_edges )
+            lower_fn = lambda y: np.nanpercentile( y, 32 )
+            lower, _, _ = scipy.stats.binned_statistic( x_observations_field, y_observations_field, lower_fn, bins=bin_edges )
+            ax.fill_between(
+                xs,
+                lower,
+                upper,
+                color = "gray",
+                alpha = 0.15,
+            )
+
+            ax.scatter(
+                x_observations_field,
+                y_observations_field,
+                alpha = 0.2,
+                s=6,
+            )    
+
+            ax.plot(
+                xs,
+                median,
+                linewidth = 5,
+                label = field,
+            )
+
+        #######################################
+        # Label rows
+        #######################################      
+        if row == "median":
+            ax.set_ylim(0,11)
+            
+            ax.set_ylabel( r'Median, ${cpy}_{1/2}$', fontsize=16 )
+
+        if row == "variance":
+            ax.set_ylim(0, 1,)
+            ax.set_ylabel( r'Variance, $\sigma_{\log(cpy)}^2$', fontsize=16 )
+
+        # Customize ticks
+        ax.tick_params( right=True, labelright=True )
+        if not ax.get_subplotspec().is_last_row():
+            ax.tick_params( axis='x', labelbottom=False )
+
+    axbox = ax.get_position()
+    ax.legend(
+        prop = {'size': 14, },
+        ncol = 1,
+        # loc = 'upper right',
+        loc = (axbox.x0 + -0.12, axbox.y0 + 1.23),
+        # loc = (axbox.x0 + 0.6, axbox.y0 + 1.23),
+        framealpha = 0.5,
+    )
+
+    # ax.set_xlabel( r'Density of previously existing research, $\rho$', fontsize=16 )
+    ax.set_xlabel( r'Density (z-score) of previously existing research, $\rho$', fontsize=16 )
+
+    # plt.tight_layout()
+
+    return (fig, ax)
+
+
+
+import seaborn as sns
+import matplotlib.transforms
+from matplotlib import patheffects
+def summary_violins(df_all: pd.DataFrame, categorization: str, quantile: float = 0.25) -> tuple[Figure, Axes]:
+    """Get a multi violin plot, by field or vectorizer.
+    
+    Args:
+        df_all: all observations, before any transforming.
+
+        categorization: one of {"fields_of_study_0", "vectorizer"}
+
+        quantile: the upper and lower quantile to compare. E.g., 0.5 is median, so lower 50% and 50% will be compared
+
+    Returns:
+        a pair (fig, ax) corresponding to matplotlib Figure and Axes for the plot.    
+    """
+    percent = int(100 * quantile)
+
+    # Transform data
+    category_names = sorted(df_all[categorization].unique())
+    dfs_category_quantiles = []
+    for category in category_names:
+        df_cat = df_all[df_all[categorization] == category]
+
+        # Create density categories
+        upper_quantile = df_cat['density'].quantile(1 - quantile)
+        lower_quantile = df_cat['density'].quantile(quantile)
+        df_cat['density_cat'] = 'center'
+        df_cat.loc[df_cat['density'] < lower_quantile, 'density_cat'] = f'lower {percent}%'
+        df_cat.loc[df_cat['density'] > upper_quantile, 'density_cat'] = f'upper {percent}%'
+        df_cat = df_cat.loc[df_cat['density_cat'] != 'center']
+        df_cat['density_cat'] = df_cat['density_cat'].astype('category')
+
+        # Annotate category
+        df_cat[categorization] = category
+
+        dfs_category_quantiles.append(df_cat)
+
+    # Combine
+    df_quantiles = pd.concat(dfs_category_quantiles)
+    # Correct duplicates 
+    df_quantiles = df_quantiles.reset_index()
+
+    # Start building figure
+    fig = plt.figure(figsize=(len(category_names) * 2.5, 6))
+    ax = plt.gca()
+    ax.set_title("Density")
+
+    sns.violinplot(
+        ax=ax,
+        data=df_quantiles,
+        x=categorization,
+        y='log_cpy',
+        hue='density_cat',
+        split=True,
+        inner='quart',
+        dodge=True,
+        gap=0,
+    )
+
+    df_by_cat = df_quantiles.groupby(categorization)
+    fraction_changes = []
+    fraction_std_changes = []
+    for i, key in enumerate(category_names):
+
+        # Get the group
+        try: 
+            df_category = df_by_cat.get_group(key)
+        except:
+            breakpoint()
+        n = df_category.shape[0]
+
+        # Median change
+        df_category_by_density = df_category.groupby('density_cat')
+        med_cpy = 10.**df_category_by_density['log_cpy'].median()
+        fraction_change = med_cpy[f'upper {percent}%'] / med_cpy[f'lower {percent}%']
+        fraction_changes.append(fraction_change)
+        median_change_str = (
+            fr'$c_{{>{percent}}} = '
+            f'{fraction_change:.2f}'
+            fr'c_{{<{percent}}}$'
+        )
+
+        # Median change in width
+        std_cpy = 10.**df_category_by_density['log_cpy'].std()
+        fraction_std_change =  std_cpy[f'upper {percent}%'] / std_cpy[f'lower {percent}%']
+        fraction_std_changes.append(fraction_std_change)
+        std_change_str = (
+            fr'$\sigma_{{>{percent}}} = '
+            f'{fraction_std_change:.2f}'
+            fr'\sigma_{{<{percent}}}$'
+        )
+
+        text = ax.annotate(
+            text=f'n={n}\n' + median_change_str + '\n' + std_change_str,
+            xy=(i, 1),
+            xycoords=matplotlib.transforms.blended_transform_factory(
+                ax.transData,
+                ax.transAxes,
+            ),
+            xytext=(0, -5),
+            textcoords='offset points',
+            ha='center',
+            va='top',
+            fontsize=14,
+        )
+        text.set_path_effects([
+            patheffects.Stroke(linewidth=3, foreground='w'),
+            patheffects.Normal()
+        ])
+
+    ax.legend(prop=dict(size=14))
+    legend = ax.get_legend()
+    legend.set_title('Density percentile', prop=dict(size=14))
+    legend.set_loc('upper center')
+    legend.set_bbox_to_anchor((0.56, 0.84))
+    legend.set_alignment('left')
+
+    return (fig, ax)

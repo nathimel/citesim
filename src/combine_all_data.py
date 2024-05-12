@@ -1,16 +1,12 @@
 """Script to compile all data from sweeps into one dataframe for easy analysis."""
 
-import hydra
 import sys
 import omegaconf
 
 import pandas as pd
-import numpy as np
 
-from hydra.core.global_hydra import GlobalHydra
 from pathlib import Path
 from tqdm import tqdm
-from experiment import Experiment
 
 
 # We don't use the hydra.compose api, since we can't use sweeps with that anyways. Instead, we literally build a giant dataframe of all outputs in multirun.
@@ -18,7 +14,7 @@ from experiment import Experiment
 def main():
 
     if len(sys.argv) != 2:
-        print("Usage: python src/get_all_data.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides.")
+        print("Usage: python src/combine_all_data.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides.")
         sys.exit(1)
 
     # Where to save the giant dataframe
