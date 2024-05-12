@@ -32,8 +32,6 @@ getrefs <- function(y, vectorizer_name, print_summary=TRUE) {
     ref_med_z = scale(ref_med),
     freq_z = scale(freq),
   ) %>% filter(
-    density_bin_z < 3,
-    density_bin_z > -3,
     ref_med_z < 3,
     ref_med_z > -3,
     freq_z < 3,
@@ -108,3 +106,107 @@ for (y in c("cpy_med", "log_cpy_var")) {
   print(paste("Saved an image to", save_fn))
   
 }
+
+for (vec in unique(df_analysis$vectorizer)) {
+    df_vec <- df_analysis %>% filter(
+        vectorizer == vec
+    )
+    (
+        ggplot(
+            df_vec,
+            aes(
+                x=year_med_z,
+                y=density_bin,
+            )
+        )
+        + geom_smooth(
+            method = "lm",
+            linewidth = 3,
+            color = "black",
+        )
+        + geom_point(
+            aes(
+                color = field,
+            ),
+            size = 0.5, 
+            alpha = 0.2, 
+        )
+        + geom_smooth(
+            aes(
+                color = field,
+            ),
+            linewidth = 1,
+        )
+        + theme_classic()
+        + ggtitle(vec)
+        + theme(
+            axis.text = element_text(size=20)
+        )
+    )
+
+  save_fn <- paste("analysis_data/figures/time/", vec, ".png", sep = "")
+
+  ggsave(
+    save_fn
+  )
+  print(paste("Saved an image to", save_fn))
+
+}
+
+
+for (vec in unique(df_analysis$vectorizer)) {
+    df_vec <- df_analysis %>% filter(
+        vectorizer == vec
+    ) %>% mutate(
+    year_med_z = scale(year_med),
+    ref_med_z = scale(ref_med),
+    freq_z = scale(freq),
+  ) %>% filter(
+    ref_med_z < 3,
+    ref_med_z > -3,
+    freq_z < 3,
+    freq_z > -3        
+    )
+
+    (
+        ggplot(
+            df_vec,
+            aes(
+                x=density_bin_z,
+                y=ref_med,
+            )
+        )
+        + geom_smooth(
+            method = "lm",
+            linewidth = 3,
+            color = "black",
+        )
+        + geom_point(
+            aes(
+                color = field,
+            ),
+            size = 0.5, 
+            alpha = 0.2, 
+        )
+        + geom_smooth(
+            aes(
+                color = field,
+            ),
+            linewidth = 1,
+        )
+        + theme_classic()
+        + ggtitle(vec)
+        + theme(
+            axis.text = element_text(size=20)
+        )
+    )
+
+  save_fn <- paste("analysis_data/figures/refs/", vec, ".png", sep = "")
+
+  ggsave(
+    save_fn
+  )
+  print(paste("Saved an image to", save_fn))
+
+}
+
