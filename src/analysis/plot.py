@@ -337,10 +337,10 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
             bin_edges = np.linspace(
                 x_observations_field.min(),
                 x_observations_field.max(),
-                10,
+                6,
             )
 
-            xs = bin_edges[:-1] + 0.33 * ( bin_edges[1] - bin_edges[0] )
+            xs = bin_edges[1:]
 
             # Binned median
             median, bin_edges, _ = scipy.stats.binned_statistic( x_observations_field, y_observations_field, 'median', bins=bin_edges )
@@ -375,11 +375,14 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
         #######################################      
         if row == "median":
             ax.set_ylim(0,11)
+            ax.set_xlim(-2.75,2.75)
             
             ax.set_ylabel( r'Median, ${cpy}_{1/2}$', fontsize=16 )
 
         if row == "variance":
             ax.set_ylim(0.1, 0.8,)
+            ax.set_xlim(-2.75,2.75)
+
             ax.set_ylabel( r'Variance, $\sigma_{\log(cpy)}^2$', fontsize=16 )
 
         # Customize ticks

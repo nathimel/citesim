@@ -163,7 +163,7 @@ for (vec in unique(df_analysis$vectorizer)) {
             df_vec,
             aes(
                 x=density_bin_z,
-                y=ref_med,
+                y=ref_med_z,
             )
         )
         + geom_smooth(
