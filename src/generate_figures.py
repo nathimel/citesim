@@ -20,8 +20,8 @@ def zscale(df_in: pd.DataFrame, col: str) -> pd.DataFrame:
 
 ##############################################################################
 
-def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_bins: int) -> pd.DataFrame:
-    """Given a dataframe and a field to subset to, cut density observations into `num_bins` and compute statistics of the resulting citation distribution induced by the density class."""
+def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_quantiles: int) -> pd.DataFrame:
+    """Given a dataframe and a field to subset to, cut density observations into `num_quantiles` (i.e., equal frequency binning) and compute statistics of the resulting citation distribution induced by the density class."""
 
     # Filter
     df = df_in[df_in["fields_of_study_0"] == field]
@@ -42,13 +42,9 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_bins:
     df = df[density_bin_max & density_bin_min & cpy_max & cpy_min]
 
     # cut
-    df['density_bin'] = pd.cut(
+    df['density_bin'] = pd.qcut(
         df['density'], 
-        bins=np.linspace(
-            df['density'].min(), 
-            df['density'].max(), 
-            num=num_bins+1,
-        ),
+        q=num_quantiles,
     )
 
     # Group data after binning
@@ -85,10 +81,6 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_bins:
         col_z = f"{col}_z"
         df_result[col_z] = zscale(df_result, col)
         
-    # Annotate counts and relative frequencies
-    df_result["count"] = df.density_bin.value_counts(sort=False, normalize=True).tolist()
-    df_result["freq"] = df.density_bin.value_counts(sort=False, normalize=False).tolist()
-
     # Annotate field and vectorizer
     df_result["field"] = field
     df_result["vectorizer"] = vectorizer
@@ -114,7 +106,7 @@ def transform_by_vectorizer(df_all: pd.DataFrame) -> pd.DataFrame:
                         df_all[df_all["vectorizer"] == vectorizer], 
                         field,
                         vectorizer,
-                        num_bins=200,
+                        num_quantiles=100,
                     ) 
                     for field in df_all["fields_of_study_0"].unique()
                 ]

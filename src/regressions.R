@@ -30,12 +30,9 @@ getrefs <- function(y, vectorizer_name, print_summary=TRUE) {
     y = .data[[y]],
     year_med_z = scale(year_med),
     ref_med_z = scale(ref_med),
-    freq_z = scale(freq),
   ) %>% filter(
     ref_med_z < 3,
     ref_med_z > -3,
-    freq_z < 3,
-    freq_z > -3
   )
   
   # Model 5: 
@@ -43,8 +40,7 @@ getrefs <- function(y, vectorizer_name, print_summary=TRUE) {
     # "y_z ~ year_med_z + density_bin_z + (1 | field)"
     # "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 | field)"
     # "y_z ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z + ref_med_z | field)"
-    "y ~ ref_med_z + year_med_z + freq_z + density_bin_z + (1 + density_bin_z | field)"
-    # "y_z ~ ref_med_z + year_med_z + freq_z + density_bin_z + (1 | field)"    
+    "y ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z | field)"
   )
   fm_5 <- as.formula(label_5)
   model_5 <- lmer(
@@ -90,12 +86,9 @@ for (y in c("cpy_med", "log_cpy_var")) {
       inner_ci_level = .9
       # plot.distributions = TRUE
     )
-      # + scale_color_viridis(discrete=TRUE)
-    # + scale_color_manual( values = c("blue", "red"))
     + theme(
       axis.text.x = element_text(size=20)
     )
-    # Add shapes for significance
 
   )
   save_fn <- paste("analysis_data/figures/coefficients/", y, ".png", sep = "")
@@ -115,7 +108,7 @@ for (vec in unique(df_analysis$vectorizer)) {
         ggplot(
             df_vec,
             aes(
-                x=year_med_z,
+                x=year_med,
                 y=density_bin,
             )
         )
@@ -160,12 +153,9 @@ for (vec in unique(df_analysis$vectorizer)) {
     ) %>% mutate(
     year_med_z = scale(year_med),
     ref_med_z = scale(ref_med),
-    freq_z = scale(freq),
   ) %>% filter(
     ref_med_z < 3,
     ref_med_z > -3,
-    freq_z < 3,
-    freq_z > -3        
     )
 
     (

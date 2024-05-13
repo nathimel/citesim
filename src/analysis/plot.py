@@ -359,14 +359,14 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
             ax.scatter(
                 x_observations_field,
                 y_observations_field,
-                alpha = 0.2,
+                alpha = 0.4,
                 s=6,
             )    
 
             ax.plot(
                 xs,
                 median,
-                linewidth = 5,
+                linewidth = 4,
                 label = field,
             )
 
@@ -379,7 +379,7 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
             ax.set_ylabel( r'Median, ${cpy}_{1/2}$', fontsize=16 )
 
         if row == "variance":
-            ax.set_ylim(0, 1,)
+            ax.set_ylim(0.1, 0.8,)
             ax.set_ylabel( r'Variance, $\sigma_{\log(cpy)}^2$', fontsize=16 )
 
         # Customize ticks
