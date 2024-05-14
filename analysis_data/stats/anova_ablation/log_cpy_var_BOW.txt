@@ -1,0 +1,9 @@
+Data: df_vectorizer
+Models:
+model_ablated: y ~ ref_med_z + year_med_z + (1 | field)
+model_w_rho: y ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z | field)
+              npar     AIC     BIC logLik deviance  Chisq Df Pr(>Chisq)    
+model_ablated    5 -2510.6 -2486.7 1260.3  -2520.6                         
+model_w_rho      8 -2593.3 -2554.9 1304.7  -2609.3 88.682  3  < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

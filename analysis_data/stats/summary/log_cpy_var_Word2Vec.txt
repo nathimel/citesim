@@ -1,0 +1,34 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: y ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z |  
+    field)
+   Data: df_vectorizer
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: -2449.7
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3093 -0.6236 -0.0329  0.5199  5.8685 
+
+Random effects:
+ Groups   Name          Variance  Std.Dev. Corr
+ field    (Intercept)   0.0062414 0.07900      
+          density_bin_z 0.0007663 0.02768  0.05
+ Residual               0.0033595 0.05796      
+Number of obs: 893, groups:  field, 9
+
+Fixed effects:
+                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)     0.371838   0.026406   8.000574  14.082 6.28e-07 ***
+ref_med_z      -0.001958   0.003830 878.414345  -0.511    0.609    
+year_med_z      0.002155   0.003561 876.492780   0.605    0.545    
+density_bin_z  -0.009206   0.010142  10.560125  -0.908    0.384    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) rf_md_ yr_md_
+ref_med_z    0.002              
+year_med_z   0.000 -0.240       
+densty_bn_z  0.045 -0.231 -0.218
