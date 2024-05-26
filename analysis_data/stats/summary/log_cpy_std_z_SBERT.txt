@@ -1,0 +1,21 @@
+
+Call:
+lm(formula = y ~ ref_med_z + year_med_z + density_bin_z, data = df_vectorizer)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.58371 -0.59248  0.00977  0.58743  3.04829 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -0.024505   0.029987  -0.817    0.414    
+ref_med_z     -0.029717   0.038394  -0.774    0.439    
+year_med_z    -0.004143   0.052576  -0.079    0.937    
+density_bin_z -0.451539   0.052525  -8.597   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.9157 on 929 degrees of freedom
+Multiple R-squared:  0.2123,	Adjusted R-squared:  0.2098 
+F-statistic: 83.46 on 3 and 929 DF,  p-value: < 2.2e-16
+

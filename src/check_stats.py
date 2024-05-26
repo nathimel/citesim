@@ -54,6 +54,7 @@ def process(mode: str) -> list[str]:
 
     data = []
     for filename in os.listdir(dir):
+        # we now have three regressions so let's not mix them up
         vectorizer = filename.split("_")[-1].split(".txt")[0]
 
         with open(os.path.join(dir, filename), "r") as f:

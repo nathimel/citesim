@@ -566,7 +566,7 @@ def tradeoffs_aggregated(df_plot: pd.DataFrame, risk: str, returns: str, color: 
         + pn.scale_color_continuous("cividis")
         + pn.labs(color="Density, $\\rho$")
         + pn.xlab("Risk, $\sigma_{\log cpy}$")
-        + pn.ylab("Returns, $\mu_{\log cpy}$")
+        + pn.ylab("Return, $\mu_{\log cpy}$")
         + pn.theme_classic()
         + pn.theme(
             # Axis font

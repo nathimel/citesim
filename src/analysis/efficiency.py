@@ -7,6 +7,8 @@ from pygmo import non_dominated_front_2d
 from scipy import interpolate
 from scipy.spatial.distance import cdist
 
+from .measures import zscale
+
 def interpolate_frontier(points: np.ndarray, num: int) -> np.ndarray:
     """Interpolate the frontier points to obtain a dense estimated bound on efficiency.
     
@@ -75,6 +77,10 @@ def annotate_optimality(df_binned: pd.DataFrame, risk: str, returns: str) -> pd.
     )
     df_binned["min_distances"] = min_dists
     df_binned["optimality"] = 1 - min_dists
+
+    for col in ["min_distances", "optimality"]:
+        col_z = f"{col}_z"
+        df_binned[col_z] = zscale(df_binned, col)
 
     # not the prettiest, but oh well
     df_binned["type"] = "observed"

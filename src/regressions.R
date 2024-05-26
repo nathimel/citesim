@@ -34,20 +34,23 @@ getrefs <- function(y, vectorizer_name, print_anova=TRUE) {
   )
   
 
-  model_w_rho <- lmer(
-    y ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z | field),
+  model_w_rho <- lm(
+    # y ~ ref_med_z + year_med_z + density_bin_z + (1 + density_bin_z | field),
+    # y ~ ref_med_z + year_med_z + density_bin_z + (1 | field),
+    y ~ ref_med_z + year_med_z + density_bin_z,
     data=df_vectorizer, 
-    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+    # control=lmControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
   )
   
   # if (print_summary) {
   #   print(summary(model_5))
   # }
   
-  model_ablated <- lmer(
-    y ~ ref_med_z + year_med_z + (1 | field), 
+  model_ablated <- lm(
+    y ~ ref_med_z + year_med_z,
+    # y ~ ref_med_z + year_med_z + (1 | field), 
     data=df_vectorizer,
-    control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+    # control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
   )
 
   stats_dir <- "analysis_data/stats/"
@@ -97,7 +100,7 @@ getrefs <- function(y, vectorizer_name, print_anova=TRUE) {
 # Forest plots
 
 # TODO: clean this up, refactor
-for (y in c("cpy_med", "log_cpy_var")) {
+for (y in c("log_cpy_mean_z", "log_cpy_std_z", "optimality_z")) {
   (
    plot_summs(
       getrefs(y, "SciBERT",),
@@ -109,12 +112,12 @@ for (y in c("cpy_med", "log_cpy_var")) {
       # model.names = c("SciBERT", "SBERT", "GPT2"),
       colors = "Rainbow",
       point.shape = FALSE,
-      robust=TRUE, 
+      # robust=TRUE,
       inner_ci_level = .9
       # plot.distributions = TRUE
     )
     + theme(
-      axis.text.x = element_text(size=20),
+      axis.text.x = element_text(size=24),
       axis.text.y = element_blank()
     )
 

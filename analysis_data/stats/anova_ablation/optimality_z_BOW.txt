@@ -1,0 +1,7 @@
+Analysis of Variance Table
+
+Model 1: y ~ ref_med_z + year_med_z + density_bin_z
+Model 2: y ~ ref_med_z + year_med_z
+  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+1    890 843.93                           
+2    891 844.73 -1  -0.80783 0.8519 0.3563
