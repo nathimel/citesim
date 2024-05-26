@@ -272,8 +272,8 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
 
     x_variable = "density_bin_z"
     y_variable_maps = {
-        "median": "cpy_med",
-        "variance": "log_cpy_var",
+        "median": "log_cpy_mean_z",
+        "variance": "log_cpy_std_z",
     }
 
     # For each trend
@@ -298,26 +298,6 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
         )
 
         xs = bin_edges[:-1] + 0.33 * ( bin_edges[1] - bin_edges[0] )
-
-        # Global median number of citations (baseline)
-        global_median = np.nanpercentile( y_observations, 50. )
-        ax.axhline(
-            global_median,
-            color = '0.1',
-            linestyle = '--',
-            linewidth = 5,
-            zorder = -100,
-        )
-        ax.annotate(
-            text = 'global\n\nmedian',
-            xy = (bin_edges[-1], global_median),
-            xycoords = 'data',
-            xytext = (0, 0),
-            textcoords = 'offset points',
-            va = 'center',
-            ha = 'right',
-            fontsize = 14,
-        )    
 
 
         #######################################
@@ -374,16 +354,16 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
         # Label rows
         #######################################      
         if row == "median":
-            ax.set_ylim(0,11)
+            # ax.set_ylim(0,11)
             ax.set_xlim(-2.75,2.75)
             
-            ax.set_ylabel( r'Median, ${cpy}_{1/2}$', fontsize=16 )
+            ax.set_ylabel( r'Mean, $\mu_{\log(cpy)}$', fontsize=16 )
 
         if row == "variance":
-            ax.set_ylim(0.1, 0.8,)
+            # ax.set_ylim(0.1, 0.8,)
             ax.set_xlim(-2.75,2.75)
 
-            ax.set_ylabel( r'Variance, $\sigma_{\log(cpy)}^2$', fontsize=16 )
+            ax.set_ylabel( r'Std, $\sigma_{\log(cpy)}$', fontsize=16 )
 
         # Customize ticks
         ax.tick_params( right=True, labelright=True )
@@ -400,7 +380,6 @@ def main_trends_mpl(df_plot: pd.DataFrame) -> tuple[Figure, Axes]:
         framealpha = 0.5,
     )
 
-    # ax.set_xlabel( r'Density of previously existing research, $\rho$', fontsize=16 )
     ax.set_xlabel( r'Density (z-score) of previously existing research, $\rho$', fontsize=16 )
 
     # plt.tight_layout()
@@ -528,3 +507,70 @@ def summary_violins(df_all: pd.DataFrame, categorization: str, quantile: float =
     legend.set_alignment('left')
 
     return (fig, ax)
+
+
+def tradeoffs_faceted(df_plot: pd.DataFrame, risk: str, returns: str, color: str) -> pn.ggplot:
+    df_all = df_plot[df_plot["type"] == "observed"]
+    df_dominant = df_plot[df_plot["type"] == "dominant"]
+
+    return (
+        pn.ggplot(
+            df_all,
+            pn.aes(
+                x=risk,
+                y=returns,
+            ),
+        )
+        + pn.geom_point(
+            pn.aes(
+                color = color,
+            )
+        )
+        + pn.geom_line(
+            df_dominant,
+        )
+        + pn.facet_wrap("field")
+        # + pn.theme_classic()
+        + pn.scale_color_continuous("cividis")
+    )
+
+# Could refactor with above
+def tradeoffs_aggregated(df_plot: pd.DataFrame, risk: str, returns: str, color: str) -> pn.ggplot:
+
+    df_all = df_plot[df_plot["type"] == "observed"]
+    df_dominant = df_plot[df_plot["type"] == "dominant"]
+
+    return (
+        pn.ggplot(
+            df_all,
+            pn.aes(
+                x=risk,
+                y=returns,
+                # color="density_bin_z", # 
+            ),
+        )
+        + pn.geom_line(
+            df_dominant,
+            color = "black",
+            size = 4,
+            # alpha = 0.2,
+            linetype = "dashed",
+        )    
+        + pn.geom_point(
+            pn.aes(
+                color = color
+            ),
+            size = 6,
+            alpha = 0.8,
+        )
+        + pn.scale_color_continuous("cividis")
+        + pn.labs(color="Density, $\\rho$")
+        + pn.xlab("Risk, $\sigma_{\log cpy}$")
+        + pn.ylab("Returns, $\mu_{\log cpy}$")
+        + pn.theme_classic()
+        + pn.theme(
+            # Axis font
+            axis_title=pn.element_text(size=24),
+            axis_text=pn.element_text(size=18),
+        )
+    )

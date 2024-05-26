@@ -6,8 +6,10 @@ warnings.filterwarnings("ignore") # bad
 import pandas as pd
 import numpy as np
 
-from analysis.plot import main_trends_mpl, summary_violins
-from util import save_fig
+from analysis.plot import main_trends_mpl, summary_violins, tradeoffs_faceted, tradeoffs_aggregated
+from analysis.efficiency import annotate_optimality
+
+from util import save_fig, save_plot
 from pathlib import Path
 
 from tqdm import tqdm
@@ -60,6 +62,10 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_quant
                 np.nanmedian(df_bin["citations_per_year"].values),
                 np.nanmedian(df_bin["references"].values),
                 np.nanmedian(df_bin["year"].values),
+                np.nanmean(df_bin["citations_per_year"].values),
+                np.nanstd(df_bin["citations_per_year"].values),
+                np.nanmean(df_bin["log_cpy"].values),
+                np.nanstd(df_bin["log_cpy"].values),
             ))
     
     # Construct dataframe
@@ -70,6 +76,10 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_quant
             "cpy_med",
             "ref_med",
             "year_med",
+            "cpy_mean",
+            "cpy_std",
+            "log_cpy_mean",
+            "log_cpy_std",
         ],
     )
 
@@ -77,7 +87,7 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_quant
     df_result["density_bin"] = [float(item.left) for item in df.density_bin.value_counts(sort=False, normalize=True).keys()]
 
     # Annotate z-scales for density and citation rates
-    for col in ["density_bin", "cpy_med", "ref_med", "year_med"]:
+    for col in df_result.columns:
         col_z = f"{col}_z"
         df_result[col_z] = zscale(df_result, col)
         
@@ -89,25 +99,30 @@ def bin_measurements(df_in: pd.DataFrame, field: str, vectorizer: str, num_quant
 
 ##############################################################################
 
-def transform_by_vectorizer(df_all: pd.DataFrame) -> pd.DataFrame:
+
+def transform_by_vectorizer(df_all: pd.DataFrame, risk: str, returns: str,) -> pd.DataFrame:
     """Transform data for analysis via binned measurements by vectorizer and field.
     
     Args:
         df_all: all observations
 
     Returns:
-        a new dataframe with (concatenated) binned measurements for each vectorizer.
+        a new dataframe with (concatenated) binned measurements for each vectorizer and measured optimality.
     """
     return pd.concat(
         [
             pd.concat(
                 [
-                    bin_measurements(
-                        df_all[df_all["vectorizer"] == vectorizer], 
-                        field,
-                        vectorizer,
-                        num_quantiles=100,
-                    ) 
+                    annotate_optimality(
+                        bin_measurements(
+                            df_all[df_all["vectorizer"] == vectorizer], 
+                            field,
+                            vectorizer,
+                            num_quantiles=100,
+                        ),
+                        risk,
+                        returns,
+                    )
                     for field in df_all["fields_of_study_0"].unique()
                 ]
             )
@@ -132,8 +147,13 @@ def main():
     df_all["log_cpy"] = np.log10(df_all["citations_per_year"])
     df_all['log_cpy'] = df_all['log_cpy'].replace(-np.inf, np.nan)
 
+    # Set the axes and color variables for tradeoffs
+    risk = "log_cpy_std_z"
+    returns = "log_cpy_mean_z"
+    color = "density_bin_z"
+
     # Main analysis data
-    df_analysis = transform_by_vectorizer(df_all)
+    df_analysis = transform_by_vectorizer(df_all, risk, returns)
 
     # Save
     df_analysis.to_csv(
@@ -143,16 +163,34 @@ def main():
 
     # Generate main trends figures
     for vec in df_analysis.vectorizer.unique():
-        # Main trends
-        fig, _ = main_trends_mpl(df_analysis[df_analysis.vectorizer == vec])
+        df_vec = df_analysis[df_analysis.vectorizer == vec]
+
+        # Tradeoffs by field
+        save_plot(
+            analysis_dir / "figures" / "tradeoffs" / "faceted" / f"{vec}.png",
+            tradeoffs_faceted(df_vec, risk, returns, color),
+        )
+        # Tradeoffs aggregating field
+        save_plot(
+            analysis_dir / "figures" / "tradeoffs" / "all" / f"{vec}.png", 
+            tradeoffs_aggregated(
+                annotate_optimality(     # re annotate globally
+                    df_vec, risk, returns,
+                ),
+                risk, returns, color,
+            ),
+        )
+
+        # Individual trends
+        fig, _ = main_trends_mpl(df_vec)
         save_fig(analysis_dir / "figures" / "main_trends" / f"{vec}.png", fig)
 
         # Violin plots
         fig, _ = summary_violins(df_all[df_all["vectorizer"] == vec], "fields_of_study_0")
         save_fig(analysis_dir / "figures" / "violins" / f"{vec}.png", fig)
-    
 
-    # Violin plot aggregating fields; n.b. this doesnt even normalize measurements by field like main_trends does.
+
+    # Violin plot aggregating fields
     fig, _ = summary_violins(df_all, "vectorizer")
     save_fig(analysis_dir / "figures" / "violins" / f"all.png", fig)
 

@@ -10,6 +10,7 @@ dependencies:
   - pip
   - pip:
     - hydra-core  
+  - pygmo
   - numpy
   - pytorch
 # and sciterra, installed via git for now
