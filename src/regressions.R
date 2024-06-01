@@ -39,7 +39,7 @@ getrefs <- function(y, vectorizer_name, print_anova=TRUE) {
     # y ~ ref_med_z + year_med_z + density_bin_z + (1 | field),
     y ~ ref_med_z + year_med_z + density_bin_z,
     data=df_vectorizer, 
-    # control=lmControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
+    # control=lmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5))
   )
   
   # if (print_summary) {
@@ -234,6 +234,59 @@ for (vec in unique(df_analysis$vectorizer)) {
     )
 
   save_fn <- paste("analysis_data/figures/refs/", vec, ".png", sep = "")
+
+  ggsave(
+    save_fn,
+    width = 8,
+    height = 5,
+  )
+  print(paste("Saved an image to", save_fn))
+
+}
+
+# TODO: refactor this looping over vecs
+
+for (vec in unique(df_analysis$vectorizer)) {
+    df_vec <- df_analysis %>% filter(
+        vectorizer == vec
+    )
+
+    (
+        ggplot(
+            df_vec,
+            aes(
+                x=density_bin,
+                y=optimality,
+            )
+        )
+        + geom_smooth(
+            method = "lm",
+            linewidth = 3,
+            color = "black",
+        )
+        + geom_point(
+            aes(
+                color = field,
+            ),
+            size = 0.5, 
+            alpha = 0.3, 
+        )
+        + geom_smooth(
+            aes(
+                color = field,
+            ),
+            linewidth = 1,
+            level = 0.8,
+        )
+        + theme_classic()
+        # + ggtitle(vec)
+        + theme(
+            axis.text = element_text(size=30),
+            axis.title = element_blank(),
+        )
+    )
+
+  save_fn <- paste("analysis_data/figures/optimality/", vec, ".png", sep = "")
 
   ggsave(
     save_fn,

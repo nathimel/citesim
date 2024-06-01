@@ -523,15 +523,30 @@ def tradeoffs_faceted(df_plot: pd.DataFrame, risk: str, returns: str, color: str
         )
         + pn.geom_point(
             pn.aes(
-                color = color,
-            )
+                color = color
+            ),
+            size = 4,
+            alpha = 0.8,
         )
-        + pn.geom_line(
-            df_dominant,
-        )
+        # + pn.geom_line(
+        #     df_dominant,
+        #     color = "black",
+        #     size = 2,
+        #     # alpha = 0.2,
+        #     linetype = "dashed",
+        # )
         + pn.facet_wrap("field")
         # + pn.theme_classic()
         + pn.scale_color_continuous("cividis")
+        + pn.labs(color="Density, $\\rho$")
+        + pn.xlab("Risk, $\sigma_{\log cpy}$")
+        + pn.ylab("Return, $\mu_{\log cpy}$")
+        + pn.theme(
+            # Axis font
+            axis_title=pn.element_text(size=24),
+            axis_text=pn.element_text(size=18),
+            strip_text=pn.element_text(size=18),
+        )
     )
 
 # Could refactor with above
