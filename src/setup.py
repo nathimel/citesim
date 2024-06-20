@@ -13,5 +13,6 @@ def main(config: DictConfig):
 
     exp = Experiment(config)
 
+
 if __name__ == "__main__":
     main()

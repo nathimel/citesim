@@ -11,10 +11,12 @@ from tqdm import tqdm
 
 # We don't use the hydra.compose api, since we can't use sweeps with that anyways. Instead, we literally build a giant dataframe of all outputs in multirun.
 
-def main():
 
+def main():
     if len(sys.argv) != 2:
-        print("Usage: python src/combine_all_data.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides.")
+        print(
+            "Usage: python src/combine_all_data.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides."
+        )
         sys.exit(1)
 
     # Where to save the giant dataframe
@@ -25,7 +27,6 @@ def main():
 
     config_fp = "conf/config.yaml"
     cfg = omegaconf.OmegaConf.load(config_fp)
-
 
     # Assume we're interested in multisweeps
     # root_dir = cfg.filepaths.hydra_sweep_root
@@ -66,7 +67,7 @@ def main():
 
     # Save
     all_data.to_csv(save_fn, index=False)
-    print(f"Saved a dataframe to {save_fn}")    
+    print(f"Saved a dataframe to {save_fn}")
 
 
 if __name__ == "__main__":

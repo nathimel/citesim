@@ -7,13 +7,15 @@ from typing import Callable
 ANOVA_RESULTS_DIR = "./analysis_data/stats/anova_ablation"
 MODEL_SUMMARY_DIR = "./analysis_data/stats/summary"
 
+
 def tokenize(lines: list[str]) -> list[list[str]]:
     return [line.split() for line in lines]
+
 
 def process_anova(data: list[list[str]]) -> tuple[float]:
     model_ablated_bic = None
     model_w_rho = None
-    
+
     for tokens in data:
         if tokens[0] == "model_ablated":
             model_ablated_bic = tokens[3]
@@ -22,12 +24,12 @@ def process_anova(data: list[list[str]]) -> tuple[float]:
 
     return (float(model_ablated_bic) - float(model_w_rho),)
 
-def process_summary(data: list[list[str]]) -> tuple[float]:
 
+def process_summary(data: list[list[str]]) -> tuple[float]:
     for num, tokens in enumerate(data):
-        if tokens[:2] == ["Random","effects:"]:
+        if tokens[:2] == ["Random", "effects:"]:
             # Parse the lines containing effects variance explained
-            lines = data[num+2:num+5]
+            lines = data[num + 2 : num + 5]
             field_var = float(lines[0][2])
             rho_var = float(lines[1][1])
             res_var = float(lines[2][1])
@@ -37,12 +39,11 @@ def process_summary(data: list[list[str]]) -> tuple[float]:
             rho_var_perc = (rho_var / total) * 100
             res_var = (res_var / total) * 100
             break
-    
+
     return (field_var_perc, rho_var_perc)
 
-    
-def process(mode: str) -> list[str]:
 
+def process(mode: str) -> list[str]:
     if mode == "anova":
         dir = ANOVA_RESULTS_DIR
         process_func = process_anova
@@ -61,15 +62,12 @@ def process(mode: str) -> list[str]:
             lines = f.readlines()
 
         tokens = tokenize(lines)
-        data.append(
-            (vectorizer, *process_func(tokens))
-        )
+        data.append((vectorizer, *process_func(tokens)))
     stat_df = pd.DataFrame(data, columns=["vectorizer"] + cols)
     return stat_df
 
 
 if __name__ == "__main__":
-
     # Anova
     df = process("anova")
     print("---------------ANOVA---------------")
@@ -81,4 +79,3 @@ if __name__ == "__main__":
     print("---------------SUMMARY---------------")
     print(df)
     print()
-    

@@ -9,9 +9,10 @@ from scipy.spatial.distance import cdist
 
 from .measures import zscale
 
+
 def interpolate_frontier(points: np.ndarray, num: int) -> np.ndarray:
     """Interpolate the frontier points to obtain a dense estimated bound on efficiency.
-    
+
     Args:
         points: a 2D array of shape `(num_optimal, 2)` representing the non-dominated (Expected Return, Risk) points.
 
@@ -30,6 +31,7 @@ def interpolate_frontier(points: np.ndarray, num: int) -> np.ndarray:
     interpolated_points = np.array(list(zip(pareto_costs, pareto_complexities)))
     return interpolated_points
 
+
 def pareto_min_distances(points: np.ndarray, frontier_points: np.ndarray) -> np.ndarray:
     """Measure the Pareto optimality of each point by measuring its Euclidean closeness to the frontier. The frontier is a line (list of points) interpolated from the pareto points.
 
@@ -41,7 +43,7 @@ def pareto_min_distances(points: np.ndarray, frontier_points: np.ndarray) -> np.
 
     Returns:
 
-        min_distances: an array of shape `len(points)` Euclidean distances for each point to the closest point on the Pareto frontier. 
+        min_distances: an array of shape `len(points)` Euclidean distances for each point to the closest point on the Pareto frontier.
     """
     # Measure closeness of each language to any frontier point
     distances = cdist(points, frontier_points)
@@ -51,9 +53,12 @@ def pareto_min_distances(points: np.ndarray, frontier_points: np.ndarray) -> np.
     min_distances /= max(min_distances)
     return min_distances
 
-def get_frontier_data(df_in: pd.DataFrame, x="log_cpy_std_z", y="log_cpy_mean_z") -> pd.DataFrame:
+
+def get_frontier_data(
+    df_in: pd.DataFrame, x="log_cpy_std_z", y="log_cpy_mean_z"
+) -> pd.DataFrame:
     """Estimate the efficient frontier of the Markowitz bullet using pygmo's non_dominated_front_2d method.
-    
+
     Args:
         df_in: the data to compute the efficient frontier for
 
@@ -62,12 +67,15 @@ def get_frontier_data(df_in: pd.DataFrame, x="log_cpy_std_z", y="log_cpy_mean_z"
     """
     # 2D array of ()
     min_points = df_in[[x, y]].values
-    min_points[:,1] *= -1
+    min_points[:, 1] *= -1
 
     dominating_indices = non_dominated_front_2d(min_points)
     return df_in.iloc[dominating_indices]
 
-def annotate_optimality(df_binned: pd.DataFrame, risk: str, returns: str) -> pd.DataFrame:
+
+def annotate_optimality(
+    df_binned: pd.DataFrame, risk: str, returns: str
+) -> pd.DataFrame:
     """Given a dataframe of binned measurements, return the dataframe annotated with optimality."""
     dominant_data = get_frontier_data(df_binned, risk, returns)
     frontier = interpolate_frontier(dominant_data[[risk, returns]].values, num=5000)
@@ -87,4 +95,4 @@ def annotate_optimality(df_binned: pd.DataFrame, risk: str, returns: str) -> pd.
     dominant_data["type"] = "dominant"
     df_out = pd.concat([df_binned, dominant_data])
 
-    return df_out    
+    return df_out

@@ -2,11 +2,17 @@
 
 import sys
 import warnings
-warnings.filterwarnings("ignore") # bad
+
+warnings.filterwarnings("ignore")  # bad
 import pandas as pd
 import numpy as np
 
-from analysis.plot import main_trends_mpl, summary_violins, tradeoffs_faceted, tradeoffs_aggregated
+from analysis.plot import (
+    main_trends_mpl,
+    summary_violins,
+    tradeoffs_faceted,
+    tradeoffs_aggregated,
+)
 from analysis.efficiency import annotate_optimality
 from analysis.measures import bin_measurements
 
@@ -16,10 +22,13 @@ from pathlib import Path
 from tqdm import tqdm
 
 
-
-def transform_by_vectorizer(df_all: pd.DataFrame, risk: str, returns: str,) -> pd.DataFrame:
+def transform_by_vectorizer(
+    df_all: pd.DataFrame,
+    risk: str,
+    returns: str,
+) -> pd.DataFrame:
     """Transform data for analysis via binned measurements by vectorizer and field.
-    
+
     Args:
         df_all: all observations
 
@@ -32,7 +41,7 @@ def transform_by_vectorizer(df_all: pd.DataFrame, risk: str, returns: str,) -> p
                 [
                     annotate_optimality(
                         bin_measurements(
-                            df_all[df_all["vectorizer"] == vectorizer], 
+                            df_all[df_all["vectorizer"] == vectorizer],
                             field,
                             vectorizer,
                             num_quantiles=100,
@@ -43,17 +52,22 @@ def transform_by_vectorizer(df_all: pd.DataFrame, risk: str, returns: str,) -> p
                     for field in df_all["fields_of_study_0"].unique()
                 ]
             )
-            for vectorizer in tqdm(df_all.vectorizer.unique(), "transforming and binning data by vectorizer and field")
+            for vectorizer in tqdm(
+                df_all.vectorizer.unique(),
+                "transforming and binning data by vectorizer and field",
+            )
         ]
     )
 
 
 ##############################################################################
 
-def main():
 
+def main():
     if len(sys.argv) != 2:
-        print("Usage: python src/generate_figures.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides.")
+        print(
+            "Usage: python src/generate_figures.py. PATH_TO_ALL_DATA \nThis script does not use hydra; do not pass overrides."
+        )
         sys.exit(1)
 
     load_fn = sys.argv[1]
@@ -62,7 +76,7 @@ def main():
 
     # Nan handling across all observations
     df_all["log_cpy"] = np.log10(df_all["citations_per_year"])
-    df_all['log_cpy'] = df_all['log_cpy'].replace(-np.inf, np.nan)
+    df_all["log_cpy"] = df_all["log_cpy"].replace(-np.inf, np.nan)
 
     # Set the axes and color variables for tradeoffs
     risk = "log_cpy_std_z"
@@ -89,12 +103,16 @@ def main():
         )
         # Tradeoffs aggregating field
         save_plot(
-            analysis_dir / "figures" / "tradeoffs" / "all" / f"{vec}.png", 
+            analysis_dir / "figures" / "tradeoffs" / "all" / f"{vec}.png",
             tradeoffs_aggregated(
-                annotate_optimality(     # re annotate globally
-                    df_vec, risk, returns,
+                annotate_optimality(  # re annotate globally
+                    df_vec,
+                    risk,
+                    returns,
                 ),
-                risk, returns, color,
+                risk,
+                returns,
+                color,
             ),
         )
 
@@ -103,15 +121,15 @@ def main():
         save_fig(analysis_dir / "figures" / "main_trends" / f"{vec}.png", fig)
 
         # Violin plots
-        fig, _ = summary_violins(df_all[df_all["vectorizer"] == vec], "fields_of_study_0")
+        fig, _ = summary_violins(
+            df_all[df_all["vectorizer"] == vec], "fields_of_study_0"
+        )
         save_fig(analysis_dir / "figures" / "violins" / f"{vec}.png", fig)
-
 
     # Violin plot aggregating fields
     fig, _ = summary_violins(df_all, "vectorizer")
     save_fig(analysis_dir / "figures" / "violins" / f"all.png", fig)
 
-    
 
 if __name__ == "__main__":
     main()
