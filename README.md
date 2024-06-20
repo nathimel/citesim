@@ -1,4 +1,13 @@
-# citesim
+# Similarity to previous research optimizes for citations
+
+This repository accompanies XXX.
+
+N.B.: this readme will be more documented soon.
+
+## Data
+
+All of the data and figures from our analysis can be found under the [analysis_data](analysis_data) folder.
+
 
 ## Replicating experiments
 
