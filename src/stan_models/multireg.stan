@@ -1,3 +1,4 @@
+// Multivariate regression model
 // This model uses the QR reparameterization, which enables easy multivariate regression
 data {
     int<lower=0> N; // Number of data items

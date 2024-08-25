@@ -1,3 +1,4 @@
+// A normal distribution
 data {
     int<lower=0> N;
     vector[N] y;

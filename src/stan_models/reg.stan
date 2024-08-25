@@ -1,3 +1,4 @@
+// Single variable regression model
 data {
     int<lower=0> N;
     vector[N] x;
