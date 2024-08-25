@@ -34,10 +34,6 @@ generated quantities {
     vector[K] beta;
     beta = R_ast_inverse * theta; // coefficients on x
 
-    // We predict a full probability distribution for each x_test
-    // This gets crazy because it produces an array of size (N, N_test)
-    array[N_test] real y_tilde = normal_rng(Q_ast_test * theta + alpha, sigma);
-
     // log_p is used to calculate the log posterior predictive density
     real log_p = normal_lpdf(y_test | Q_ast_test * theta + alpha, sigma);
 }
