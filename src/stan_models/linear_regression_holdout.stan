@@ -2,6 +2,9 @@ data {
     int<lower=0> N;
     vector[N] x;
     vector[N] y;
+    int<lower=0> N_test;
+    vector[N_test] x_test;
+    vector[N_test] y_test;
 }
 parameters {
     real alpha;
@@ -11,6 +14,6 @@ parameters {
 model {
     y ~ normal(alpha + beta * x, sigma);
 }
-// generated quantities {
-    // array[N] real y_rep = normal_rng(alpha + beta * x, sigma);
-// }
+generated quantities {
+    real log_p = normal_lpdf(y_test | alpha + beta * x_test, sigma);
+}
