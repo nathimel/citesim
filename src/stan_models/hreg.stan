@@ -2,7 +2,7 @@ data {
     int<lower=1> D; // Number of dimensions per obs
     int<lower=0> N; // Number of obs
     int<lower=1> L; // Number of categories (levels)
-    array[N] int<lower=0, upper=1> y; // Outcome per obs
+    array[N] real y; // Outcome per obs
     array[N] int<lower=1, upper=L> ll; // Category per obs
     array[N] row_vector[D] x; // Observations
 }
@@ -10,17 +10,17 @@ parameters {
     real alpha; // Global intercept
     real<lower=0> sigma; // Global error
     array[D] real mu; // Mean slope across levels
-    array[D] real<lower=0> sigma; // Std between slopes of diff levels
+    array[D] real<lower=0> sigma_beta; // Std between slopes of diff levels
     array[L] vector[D] beta; // Slope per level
 }
 model {
     for (d in 1:D) {
         for (l in 1:L) {
-            beta[l, d] ~ normal(mu[d], sigma[d]); // One beta per level and dimension
+            beta[l, d] ~ normal(mu[d], sigma_beta[d]); // One beta per level and dimension
         }
     }
     for (n in 1:N) {
-        y[n] ~ normal(alpha + beta[ll[n]] * x[n], sigma);
+        y[n] ~ normal(alpha + x[n] * beta[ll[n]], sigma);
     }
 }
 // data {
