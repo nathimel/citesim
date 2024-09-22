@@ -14,14 +14,17 @@ parameters {
     array[L] vector[D] beta; // Slope per level
 }
 model {
-    for (d in 1:D) {
-        for (l in 1:L) {
-            beta[l, d] ~ normal(mu[d], sigma_beta[d]); // One beta per level and dimension
-        }
+    // Loop through levels and draw the slopes
+    for (l in 1:L) {
+        beta[l] ~ normal(mu, sigma_beta); // One beta per level and dimension
     }
+    // Loop through observations and create the y input for each
+    vector[N] y_mu;
     for (n in 1:N) {
-        y[n] ~ normal(alpha + x[n] * beta[ll[n]], sigma);
+        y_mu[n] = alpha + x[n] * beta[ll[n]];
     }
+    // Vectorized normal fn
+    y ~ normal(y_mu, sigma);
 }
 // data {
 //    int<lower=0> N;
