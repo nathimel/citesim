@@ -4,11 +4,9 @@
 data {
     // Shared quantities
     int<lower=0> N; // Number of obs
-    int<lower=1> L; // Number of categories (levels)
     array[N] real y; // Outcome per obs
-    array[N] int<lower=1, upper=L> ll; // Category per obs
 
-    // Test data
+    // Shared test data
     int<lower=0> N_test;
     vector[N] y_test;
 
@@ -19,6 +17,8 @@ data {
 
     // Hreg quantities
     int<lower=1> D; // Number of dimensions/predictors for hreg
+    int<lower=1> L; // Number of categories (levels)
+    array[N] int<lower=1, upper=L> ll; // Category per obs
     array[N] row_vector[D] x_h; // Observations
     array[N_test] row_vector[D] x_h_test; // Test observations
 }
@@ -67,6 +67,10 @@ model {
     y ~ normal(mu, sigma);
 }
 generated quantities {
+    // Multireg betas
+    vector[K] beta_m;
+    beta_m = R_ast_inverse * theta; // coefficients on x
+
     // log_p is used to calculate the log posterior predictive density
     vector[N] mu = alpha + Q_ast_test * theta;
     for (n in 1:N) {
