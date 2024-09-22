@@ -1,3 +1,5 @@
+// Hierarchical regression model
+// This model follows the same structure as shown in the STAN users guide.
 data {
     int<lower=1> D; // Number of dimensions per obs
     int<lower=0> N; // Number of obs
