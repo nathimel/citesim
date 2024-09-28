@@ -72,9 +72,12 @@ generated quantities {
     beta_m = R_ast_inverse * theta; // coefficients on x
 
     // log_p is used to calculate the log posterior predictive density
-    vector[N] mu = alpha + Q_ast_test * theta;
-    for (n in 1:N) {
-        mu[n] += x_h_test[n] * beta[ll[n]];
+    real log_p;
+    {
+        vector[N] mu = alpha + Q_ast_test * theta;
+        for (n in 1:N) {
+            mu[n] += x_h_test[n] * beta[ll[n]];
+        }
+        log_p = normal_lpdf(y_test | mu, sigma);
     }
-    real log_p = normal_lpdf(y_test | mu, sigma);
 }

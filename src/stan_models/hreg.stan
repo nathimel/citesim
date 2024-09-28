@@ -35,9 +35,13 @@ model {
 }
 generated quantities {
     // log_p is used to calculate the log posterior predictive density
-    vector[N] mu; // The mean for y, which is a function of alpha, beta, etc
-    for (n in 1:N) {
-        mu[n] = alpha + x[n] * beta[ll[n]];
+    real log_p;
+    // Nested block lets us declare a local variable mu that's not saved
+    {
+        vector[N] mu; // The mean for y, which is a function of alpha, beta, etc
+        for (n in 1:N) {
+            mu[n] = alpha + x[n] * beta[ll[n]];
+        }
+        log_p = normal_lpdf(y_test | mu, sigma);
     }
-    real log_p = normal_lpdf(y_test | mu, sigma);
 }
