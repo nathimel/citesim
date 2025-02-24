@@ -8,7 +8,7 @@ data {
 
     // Shared test data
     int<lower=0> N_test;
-    vector[N] y_test;
+    vector[N_test] y_test;
 
     // Multireg quantities
     int<lower=1> K; // Number of predictors/dimensions for multiregression

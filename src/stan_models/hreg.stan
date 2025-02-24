@@ -11,7 +11,7 @@ data {
     // Test data
     int<lower=0> N_test;
     array[N_test] row_vector[D] x_test;
-    vector[N] y_test;
+    vector[N_test] y_test;
 }
 parameters {
     real alpha; // Global intercept

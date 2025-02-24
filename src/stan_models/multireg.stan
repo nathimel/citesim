@@ -7,7 +7,7 @@ data {
     vector[N] y; // outcome vector
     int<lower=0> N_test;
     matrix[N_test, K] x_test;
-    vector[N] y_test;
+    vector[N_test] y_test;
 }
 transformed data {
     matrix[N, K] Q_ast;
