@@ -44,8 +44,8 @@ generated quantities {
     real log_p;
     // Nested block lets us declare a local variable mu that's not saved
     {
-        vector[N] mu; // The mean for y, which is a function of alpha, beta, etc
-        for (n in 1:N) {
+        vector[N_test] mu; // The mean for y, which is a function of alpha, beta, etc
+        for (n in 1:N_test) {
             mu[n] = alpha + x[n] * beta[ll[n], kk[n]];
         }
         log_p = normal_lpdf(y_test | mu, sigma);
