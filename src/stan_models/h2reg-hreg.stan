@@ -50,6 +50,9 @@ model {
 generated quantities {
     // log_p is used to calculate the log posterior predictive density
     real log_p;
+    // RMSE
+    real rmse;
+
     // Nested block lets us declare a local variable mu that's not saved
     {
         vector[N_test] mu; // The mean for y, which is a function of alpha, beta, etc
@@ -57,5 +60,6 @@ generated quantities {
             mu[n] = alpha + x[n] * beta[ll[n], kk[n]] + xd[n] * betad[ll[n]];
         }
         log_p = normal_lpdf(y_test | mu, sigma);
+        rmse = sqrt(mean((y_test - mu).^2));
     }
 }
