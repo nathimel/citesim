@@ -77,13 +77,13 @@ Further visualizations can be reproduced from the [generate_figures.py](src/gene
 To cite this work, please use:
 
 ```bibtex
-@misc{imel2025densityasymmetrycitationdynamics,
-      title={Density, asymmetry and citation dynamics in scientific literature}, 
-      author={Nathaniel Imel and Zachary Hafen},
-      year={2025},
-      eprint={2506.23366},
-      archivePrefix={arXiv},
-      primaryClass={cs.DL},
-      url={https://arxiv.org/abs/2506.23366}, 
+@misc{Imel2025Density,
+  author       = {Imel, Nathaniel and Hafen, Zachary},
+  title        = {Density, asymmetry and citation dynamics in scientific literature},
+  year         = {2025},
+  eprint       = {2506.23366},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DL},
+  url          = {https://arxiv.org/abs/2506.23366},
 }
 ```
