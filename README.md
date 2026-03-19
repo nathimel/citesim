@@ -1,4 +1,4 @@
-# Density, asymmetry and citation dynamics in scientific literature.
+# Density, asymmetry and citation dynamics in scientific literature
 
 This repository accompanies the following paper:
 
@@ -71,3 +71,19 @@ For now, to replicate results, or continue expanding/analyzing, select the folde
 Notice the quotes around the list containing Medicine in one of the overrides.
 
 Further visualizations can be reproduced from the [generate_figures.py](src/generate_figures.py) script and the [notebooks](src/notebooks) folder.
+
+## Citation
+
+To cite this work, please use:
+
+```bibtex
+@misc{imel2025densityasymmetrycitationdynamics,
+      title={Density, asymmetry and citation dynamics in scientific literature}, 
+      author={Nathaniel Imel and Zachary Hafen},
+      year={2025},
+      eprint={2506.23366},
+      archivePrefix={arXiv},
+      primaryClass={cs.DL},
+      url={https://arxiv.org/abs/2506.23366}, 
+}
+```
