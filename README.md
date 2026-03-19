@@ -9,7 +9,7 @@ Imel, Nathaniel and Hafen, Zachary. Density, asymmetry and citation dynamics in 
 All of the data and figures from our analysis can be found under the [analysis_data](analysis_data) folder.
 
 
-## Replicating experiments
+## Reproducing experiments
 
 To analyze the experiments we run, use the commands:
 
@@ -50,9 +50,15 @@ To analyze the experiments we run, use the commands:
     `python src/analyze.py experiment.atlas.center=Andre2018 experiment.cartography.required_pub_conditions.fields_of_study="[Mathematics]"`
 
 
-## Usage
+### Requirements
 
-The relevant scripts to run are
+Create a fresh conda environment and install the dependencies found in [environment.yaml](environment.yaml). 
+
+In addition, this repo depends centrally on the [sciterra](https://github.com/nathimel/sciterra) package. Follow the instructions at the linked repo for installation.
+
+### Usage
+
+To run a new analysis, the relevant scripts to run are
 
 `python src/build_atlas.py`
 
