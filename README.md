@@ -1,8 +1,8 @@
-# Similarity to previous research optimizes for citations
+# Density, asymmetry and citation dynamics in scientific literature.
 
-This repository accompanies XXX.
+This repository accompanies the following paper:
 
-N.B.: this readme will be more documented soon.
+Imel, Nathaniel and Hafen, Zachary. Density, asymmetry and citation dynamics in scientific literature. https://arxiv.org/abs/2506.23366
 
 ## Data
 
@@ -63,3 +63,5 @@ For now, to replicate results, or continue expanding/analyzing, select the folde
 `python src/build_atlas.py -m experiment.vectorizer.name=GPT2 experiment.atlas.center=Ololube2012 experiment.cartography.required_pub_conditions.fields_of_study="[Education]" experiment.cartography.target_size=30000 experiment.cartography.n_pubs_max=500`
 
 Notice the quotes around the list containing Medicine in one of the overrides.
+
+Further visualizations can be reproduced from the [generate_figures.py](src/generate_figures.py) script and the [notebooks](src/notebooks) folder.
